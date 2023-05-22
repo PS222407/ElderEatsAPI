@@ -1,3 +1,4 @@
+using ElderEatsAPI.Data;
 using ElderEatsAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,7 +11,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 /*builder.Services.AddDbContext<ProductContext>(opt =>  
     opt.UseSqlServer(connectionString));*/
 var serverVersion = new MySqlServerVersion(new Version(8, 0, 24));
-builder.Services.AddDbContext<ProductContext>(opt =>
+builder.Services.AddDbContext<ElderEatsContext>(opt =>
     opt.UseMySql(connectionString, serverVersion));
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
