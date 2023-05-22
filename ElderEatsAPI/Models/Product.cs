@@ -10,7 +10,6 @@ public class Product
 
     public string ?Brand { get; set; }
 
-
     [Column("quantity_in_package")]
     public string ?QuantityInPackage { get; set; }
 

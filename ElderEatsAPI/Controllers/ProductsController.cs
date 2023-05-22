@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ElderEatsAPI.Models;
+using ElderEatsAPI.Data;
 
 namespace ElderEatsAPI.Controllers
 {
@@ -13,9 +14,9 @@ namespace ElderEatsAPI.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly ProductContext _context;
+        private readonly ElderEatsContext _context;
 
-        public ProductsController(ProductContext context)
+        public ProductsController(ElderEatsContext context)
         {
             _context = context;
         }
