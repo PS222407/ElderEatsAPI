@@ -5,7 +5,7 @@ namespace ElderEatsAPI.Interfaces;
 
 public interface IAccountRepository
 {
-    public Account GetAccount(int id);
+    public Account? GetAccount(int id);
 
     public List<Product> GetAccountProducts(int id);
 }
