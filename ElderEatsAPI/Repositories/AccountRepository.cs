@@ -6,16 +6,16 @@ namespace ElderEatsAPI.Repositories;
 
 public class AccountRepository : IAccountRepository
 {
-    private DataContext _context;
+    private readonly DataContext _context;
 
     public AccountRepository(DataContext context)
     {
         _context = context;
     }
 
-    public Account ?GetAccount(int id)
+    public Account? GetAccount(int id)
     {
-        return _context.Accounts.Where(a => a.Id == id).FirstOrDefault();
+        return _context.Accounts.FirstOrDefault(a => a.Id == id);
     }
 
     public List<Product> GetAccountProducts(int id)
