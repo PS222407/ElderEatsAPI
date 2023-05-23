@@ -14,9 +14,9 @@ namespace ElderEatsAPI.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly ElderEatsContext _context;
+        private readonly DataContext _context;
 
-        public ProductsController(ElderEatsContext context)
+        public ProductsController(DataContext context)
         {
             _context = context;
         }

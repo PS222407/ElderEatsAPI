@@ -7,6 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ElderEatsAPI.Models;
 using ElderEatsAPI.Data;
+using ElderEatsAPI.Repositories;
+using ElderEatsAPI.Interfaces;
+using ElderEatsAPI.Dto;
+using AutoMapper;
 
 namespace ElderEatsAPI.Controllers;
 
@@ -14,110 +18,38 @@ namespace ElderEatsAPI.Controllers;
 [ApiController]
 public class AccountsController : ControllerBase
 {
-    private readonly ElderEatsContext _context;
+    private IAccountRepository _accountRepository;
+    private IMapper _mapper;
 
-    public AccountsController(ElderEatsContext context)
+    public AccountsController(IAccountRepository accountRepository, IMapper mapper)
     {
-        _context = context;
+        _accountRepository = accountRepository;
+        _mapper = mapper;
     }
 
-    // GET: api/Accounts
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Account>>> GetAccounts()
+    [HttpGet("account/{id}")]
+    public IActionResult GetAccount(int id)
     {
-      if (_context.Accounts == null)
-      {
-          return NotFound();
-      }
-        return await _context.Accounts.ToListAsync();
+        AccountDto accounts = _mapper.Map<AccountDto>(_accountRepository.GetAccount(id));
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(accounts);
     }
 
-    // GET: api/Accounts/5
-    [HttpGet("{id}")]
-    public async Task<ActionResult<Account>> GetAccount(long id)
+    [HttpGet("account/{id}/products")]
+    public IActionResult GetAccountProducts(int id)
     {
-      if (_context.Accounts == null)
-      {
-          return NotFound();
-      }
-        var account = await _context.Accounts.FindAsync(id);
+        List<ProductDto> products = _mapper.Map<List<ProductDto>>(_accountRepository.GetAccountProducts(id));
 
-        if (account == null)
+        if (!ModelState.IsValid)
         {
-            return NotFound();
+            return BadRequest(ModelState);
         }
 
-        return account;
-    }
-
-    // PUT: api/Accounts/5
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-    [HttpPut("{id}")]
-    public async Task<IActionResult> PutAccount(long id, Account account)
-    {
-        if (id != account.Id)
-        {
-            return BadRequest();
-        }
-
-        _context.Entry(account).State = EntityState.Modified;
-
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!AccountExists(id))
-            {
-                return NotFound();
-            }
-            else
-            {
-                throw;
-            }
-        }
-
-        return NoContent();
-    }
-
-    // POST: api/Accounts
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-    [HttpPost]
-    public async Task<ActionResult<Account>> PostAccount(Account account)
-    {
-      if (_context.Accounts == null)
-      {
-          return Problem("Entity set 'AccountContext.Accounts'  is null.");
-      }
-        _context.Accounts.Add(account);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetAccount), new { id = account.Id }, account);
-    }
-
-    // DELETE: api/Accounts/5
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAccount(long id)
-    {
-        if (_context.Accounts == null)
-        {
-            return NotFound();
-        }
-        var account = await _context.Accounts.FindAsync(id);
-        if (account == null)
-        {
-            return NotFound();
-        }
-
-        _context.Accounts.Remove(account);
-        await _context.SaveChangesAsync();
-
-        return NoContent();
-    }
-
-    private bool AccountExists(long id)
-    {
-        return (_context.Accounts?.Any(e => e.Id == id)).GetValueOrDefault();
+        return Ok(products);
     }
 }
