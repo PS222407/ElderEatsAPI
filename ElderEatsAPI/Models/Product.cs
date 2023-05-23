@@ -15,5 +15,7 @@ public class Product
 
     public string ?Barcode { get; set; }
 
-    public string ?Image { get; set; }
+    public string? Image { get; set; }
+
+    public List<AccountProduct> AccountProducts { get; set; }
 }

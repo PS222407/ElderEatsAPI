@@ -1,25 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Jens\\Desktop\\Fontys\\proftaak\\ElderEatsAPI\\ElderEatsAPI\\ElderEatsAPI.csproj": {}
+    "D:\\z.Projecten\\.C#\\ElderEatsAPI\\ElderEatsAPI\\ElderEatsAPI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Jens\\Desktop\\Fontys\\proftaak\\ElderEatsAPI\\ElderEatsAPI\\ElderEatsAPI.csproj": {
+    "D:\\z.Projecten\\.C#\\ElderEatsAPI\\ElderEatsAPI\\ElderEatsAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Jens\\Desktop\\Fontys\\proftaak\\ElderEatsAPI\\ElderEatsAPI\\ElderEatsAPI.csproj",
+        "projectUniqueName": "D:\\z.Projecten\\.C#\\ElderEatsAPI\\ElderEatsAPI\\ElderEatsAPI.csproj",
         "projectName": "ElderEatsAPI",
-        "projectPath": "C:\\Users\\Jens\\Desktop\\Fontys\\proftaak\\ElderEatsAPI\\ElderEatsAPI\\ElderEatsAPI.csproj",
+        "projectPath": "D:\\z.Projecten\\.C#\\ElderEatsAPI\\ElderEatsAPI\\ElderEatsAPI.csproj",
         "packagesPath": "C:\\Users\\Jens\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Jens\\Desktop\\Fontys\\proftaak\\ElderEatsAPI\\ElderEatsAPI\\obj\\",
+        "outputPath": "D:\\z.Projecten\\.C#\\ElderEatsAPI\\ElderEatsAPI\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+          "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet"
         ],
         "configFilePaths": [
           "C:\\Users\\Jens\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net7.0"
@@ -44,6 +44,18 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "dependencies": {
+            "AutoMapper": {
+              "target": "Package",
+              "version": "[12.0.1, )"
+            },
+            "AutoMapper.Extensions.Microsoft.DependencyInjection": {
+              "target": "Package",
+              "version": "[12.0.1, )"
+            },
+            "Microsoft.AspNetCore.Mvc.NewtonsoftJson": {
+              "target": "Package",
+              "version": "[7.0.5, )"
+            },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[7.0.5, )"
@@ -94,7 +106,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.201\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.202\\RuntimeIdentifierGraph.json"
         }
       }
     }
