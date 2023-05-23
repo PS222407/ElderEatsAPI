@@ -18,8 +18,8 @@ namespace ElderEatsAPI.Controllers;
 [ApiController]
 public class AccountsController : ControllerBase
 {
-    private IAccountRepository _accountRepository;
-    private IMapper _mapper;
+    private readonly IAccountRepository _accountRepository;
+    private readonly IMapper _mapper;
 
     public AccountsController(IAccountRepository accountRepository, IMapper mapper)
     {
