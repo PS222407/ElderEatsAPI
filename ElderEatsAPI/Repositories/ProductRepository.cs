@@ -25,6 +25,8 @@ public class ProductRepository : IProductRepository
 
     public bool StoreProduct(Product product)
     {
+        product.CreatedAt = DateTime.Now;
+        product.UpdatedAt = DateTime.Now;
         _context.Add(product);
 
         return Save();

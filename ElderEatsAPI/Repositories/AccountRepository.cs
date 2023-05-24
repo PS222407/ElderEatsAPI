@@ -1,6 +1,7 @@
 ﻿using ElderEatsAPI.Data;
 using ElderEatsAPI.Interfaces;
 using ElderEatsAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ElderEatsAPI.Repositories;
 
@@ -23,9 +24,15 @@ public class AccountRepository : IAccountRepository
         return _context.Accounts.FirstOrDefault(a => a.Token == token);
     }
 
-    public List<User> GetAccountUsers(int id)
+    public Account? GetAccountWithUsers(int id)
     {
-        return _context.AccountUsers.Where(au => au.AccountId == id).Select(u => u.User).ToList();
+        Account? account = _context.Accounts
+            .Where(a => a.Id == id)
+            .Include(a => a.AccountUsers)
+            .ThenInclude(au => au.User)
+            .FirstOrDefault();
+
+        return account;
     }
 
     public List<Product> GetAccountProducts(int id)
@@ -48,6 +55,24 @@ public class AccountRepository : IAccountRepository
         _context.Update(account);
 
         return Save();
+    }
+
+    public bool UpdateAccountUserConnection(AccountUser accountUser)
+    {
+        accountUser.UpdatedAt = DateTime.Now;
+        _context.Update(accountUser);
+
+        return Save();
+    }
+
+    public bool AccountUserExists(int accountId, int userId)
+    {
+        return _context.AccountUsers.Any(au => au.UserId == userId && au.AccountId == accountId);
+    }
+    
+    public AccountUser? FindAccountUser(int accountId, int userId)
+    {
+        return _context.AccountUsers.FirstOrDefault(au => au.UserId == userId && au.AccountId == accountId);
     }
 
     public bool AccountExists(int id)

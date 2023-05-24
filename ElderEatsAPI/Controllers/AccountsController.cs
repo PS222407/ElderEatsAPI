@@ -71,14 +71,18 @@ public class AccountsController : ControllerBase
     [HttpGet("{id:int}/users")]
     public IActionResult GetAccountUsers(int id)
     {
-        List<UserDto> userDtos = _mapper.Map<List<UserDto>>(_accountRepository.GetAccountUsers(id));
+        Account? account = _accountRepository.GetAccountWithUsers(id);
 
+        if (account == null)
+        {
+            return NotFound();
+        }
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        return Ok(userDtos);
+        return Ok(account);
     }
 
     [HttpPost]
@@ -113,6 +117,27 @@ public class AccountsController : ControllerBase
         if (!_accountRepository.UpdateAccount(account))
         {
             ModelState.AddModelError("", "Updating account went wrong");
+
+            return StatusCode(500, ModelState);
+        }
+
+        return NoContent();
+    }
+
+    [HttpPut("{accountId:int}/user/{userId:int}")]
+    public IActionResult UpdateAccountUserConnection([FromRoute] int accountId, [FromRoute] int userId, [FromBody] AccountUserDto accountUserDto)
+    {
+        AccountUser? accountUser = _accountRepository.FindAccountUser(accountId, userId);
+        if (accountUser == null)
+            return NotFound();
+
+        if (!ModelState.IsValid)
+            return BadRequest();
+
+        accountUser.Status = (int)accountUserDto.Status;
+        if (!_accountRepository.UpdateAccountUserConnection(accountUser))
+        {
+            ModelState.AddModelError("", "Updating account user's connection status went wrong");
 
             return StatusCode(500, ModelState);
         }
