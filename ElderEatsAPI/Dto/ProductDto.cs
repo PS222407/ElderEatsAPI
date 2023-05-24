@@ -1,6 +1,4 @@
-﻿using ElderEatsAPI.Models;
-using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using Newtonsoft.Json;
 
 namespace ElderEatsAPI.Dto;
 
@@ -19,10 +17,10 @@ public class ProductDto
 
     public string? Image { get; set; }
 
-    public List<AccountProduct> AccountProducts { get; set; }
+/*    public List<AccountProduct>? AccountProducts { get; set; }
 
     public bool ShouldSerializeAccountProducts()
     {
         return AccountProducts != null && AccountProducts.Count > 0;
-    }
+    }*/
 }

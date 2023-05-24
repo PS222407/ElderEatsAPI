@@ -16,6 +16,12 @@ public class Product
     public string ?Barcode { get; set; }
 
     public string? Image { get; set; }
+    
+    [Column("created_at")]
+    public DateTime CreatedAt { get; set; }
 
-    public List<AccountProduct> AccountProducts { get; set; }
+    [Column("updated_at")]
+    public DateTime UpdatedAt { get; set; }
+
+    public List<AccountProduct>? AccountProducts { get; set; }
 }

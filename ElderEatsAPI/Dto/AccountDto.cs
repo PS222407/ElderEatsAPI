@@ -20,10 +20,10 @@ public class AccountDto
 
     public DateTime? NotificationLastSentAt { get; set; }
 
-    public List<AccountProduct> AccountProducts { get; set; }
+/*    public List<AccountProduct> AccountProducts { get; set; }
 
     public bool ShouldSerializeAccountProducts()
     {
         return AccountProducts != null && AccountProducts.Count > 0;
-    }
+    }*/
 }

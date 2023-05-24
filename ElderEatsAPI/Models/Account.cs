@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ElderEatsAPI.Models;
 
@@ -20,6 +18,14 @@ public class Account
 
     [Column("notification_last_sent_at")]
     public DateTime ?NotificationLastSentAt { get; set; }
+    
+    [Column("created_at")]
+    public DateTime? CreatedAt { get; set; }
+
+    [Column("updated_at")]
+    public DateTime UpdatedAt { get; set; }
 
     public List<AccountProduct> AccountProducts { get; set; }
+    
+    public List<AccountUser> AccountUsers { get; set; }
 }

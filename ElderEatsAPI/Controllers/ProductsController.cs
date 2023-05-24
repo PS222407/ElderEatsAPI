@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ElderEatsAPI.Models;
 using ElderEatsAPI.Data;
+using ElderEatsAPI.Interfaces;
+using AutoMapper;
+using ElderEatsAPI.Dto;
 
 namespace ElderEatsAPI.Controllers
 {
@@ -16,44 +14,52 @@ namespace ElderEatsAPI.Controllers
     {
         private readonly DataContext _context;
 
-        public ProductsController(DataContext context)
+        private readonly IProductRepository _productRepository;
+
+        private readonly IMapper _mapper;
+
+        public ProductsController(DataContext context, IProductRepository productRepository, IMapper mapper)
         {
             _context = context;
+            _productRepository = productRepository;
+            _mapper = mapper;
         }
 
-        // GET: api/Products
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        public IActionResult GetProducts()
         {
-          if (_context.Products == null)
-          {
-              return NotFound();
-          }
-            return await _context.Products.ToListAsync();
+            List<ProductDto> productsDto = _mapper.Map<List<ProductDto>>(_productRepository.GetProducts());
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            return Ok(productsDto);
         }
 
-        // GET: api/Products/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProduct(long id)
+        public IActionResult GetProduct(int id)
         {
-          if (_context.Products == null)
-          {
-              return NotFound();
-          }
-            var product = await _context.Products.FindAsync(id);
+            ProductDto productDto = _mapper.Map<ProductDto>(_productRepository.GetProduct(id));
 
-            if (product == null)
+            if (productDto == null)
             {
                 return NotFound();
             }
 
-            return product;
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            return Ok(productDto);
         }
 
         // PUT: api/Products/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(long id, Product product)
+        public async Task<IActionResult> PutProduct([FromQuery] long id, [FromBody] Product product)
         {
             if (id != product.Id)
             {
@@ -81,29 +87,30 @@ namespace ElderEatsAPI.Controllers
             return NoContent();
         }
 
-        // POST: api/Products
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Product>> PostProduct(Product product)
+        public IActionResult StoreProduct(ProductDto productDto)
         {
-          if (_context.Products == null)
-          {
-              return Problem("Entity set 'ProductContext.Products'  is null.");
-          }
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
+            if (productDto == null)
+                return BadRequest();
 
+            Product product = _mapper.Map<Product>(productDto);
+
+            bool isSuccess = _productRepository.StoreProduct(product);
+            if (!isSuccess)
+            {
+                ModelState.AddModelError("", "Error while creating product to database");
+
+                return StatusCode(500, ModelState);
+            }
+            
             return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
+            return Ok("Product successfully created");
         }
 
         // DELETE: api/Products/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(long id)
         {
-            if (_context.Products == null)
-            {
-                return NotFound();
-            }
             var product = await _context.Products.FindAsync(id);
             if (product == null)
             {
