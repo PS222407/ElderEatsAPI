@@ -1,4 +1,5 @@
 ﻿using ElderEatsAPI.Data;
+using ElderEatsAPI.Enums;
 using ElderEatsAPI.Interfaces;
 using ElderEatsAPI.Models;
 using Microsoft.EntityFrameworkCore;
@@ -40,6 +41,30 @@ public class AccountRepository : IAccountRepository
         return account;
     }
 
+    public Account? GetAccountWithConnectedUsers(int id)
+    {
+        Account? account = _context.Accounts
+            .Where(a => a.Id == id)
+            .Include(a => a.AccountUsers
+                .Where(au => au.Status == (int)ConnectionStatus.Connected))
+            .ThenInclude(au => au.User)
+            .FirstOrDefault();
+
+        return account;
+    }
+
+    public Account? GetAccountWithProcessingUsers(int id)
+    {
+        Account? account = _context.Accounts
+            .Where(a => a.Id == id)
+            .Include(a => a.AccountUsers
+                .Where(au => au.Status == (int)ConnectionStatus.InProcess))
+            .ThenInclude(au => au.User)
+            .FirstOrDefault();
+
+        return account;
+    }
+
     public List<Product> GetAccountProducts(int id)
     {
         return _context.AccountProducts.Where(ap => ap.AccountId == id).Select(p => p.Product).ToList();
@@ -74,10 +99,17 @@ public class AccountRepository : IAccountRepository
     {
         return _context.AccountUsers.Any(au => au.UserId == userId && au.AccountId == accountId);
     }
-    
+
     public AccountUser? FindAccountUser(int accountId, int userId)
     {
         return _context.AccountUsers.FirstOrDefault(au => au.UserId == userId && au.AccountId == accountId);
+    }
+
+    public bool DetachAccountUser(AccountUser accountUser)
+    {
+        _context.Remove(accountUser);
+
+        return Save();
     }
 
     public bool AccountExists(int id)

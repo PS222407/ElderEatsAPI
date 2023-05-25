@@ -102,6 +102,40 @@ public class AccountsController : ControllerBase
 
         return Ok(account);
     }
+    
+    [HttpGet("{id:int}/Users/Connected")]
+    public IActionResult GetAccountConnectedUsers(int id)
+    {
+        Account? account = _accountRepository.GetAccountWithConnectedUsers(id);
+
+        if (account == null)
+        {
+            return NotFound();
+        }
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(account);
+    }
+    
+    [HttpGet("{id:int}/Users/InProcess")]
+    public IActionResult GetAccountInProcessUsers(int id)
+    {
+        Account? account = _accountRepository.GetAccountWithProcessingUsers(id);
+
+        if (account == null)
+        {
+            return NotFound();
+        }
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(account);
+    }
 
     [HttpPost]
     public IActionResult StoreAccount([FromBody] AccountPostDto accountDto)
@@ -156,6 +190,26 @@ public class AccountsController : ControllerBase
         if (!_accountRepository.UpdateAccountUserConnection(accountUser))
         {
             ModelState.AddModelError("", "Updating account user's connection status went wrong");
+
+            return StatusCode(500, ModelState);
+        }
+
+        return NoContent();
+    }
+
+    [HttpDelete("{accountId}/User/{userId}")]
+    public IActionResult DetachAccountUser([FromRoute] int accountId, [FromRoute] int userId)
+    {
+        AccountUser? accountUser = _accountRepository.FindAccountUser(accountId, userId);
+
+        if (accountUser == null)
+        {
+            return NotFound();
+        }
+
+        if (!_accountRepository.DetachAccountUser(accountUser))
+        {
+            ModelState.AddModelError("", "Detaching user went wrong");
 
             return StatusCode(500, ModelState);
         }
