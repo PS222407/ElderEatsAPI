@@ -37,10 +37,28 @@ public class AccountsController : ControllerBase
     //     return Ok(accountDto);
     // }
 
-    [HttpGet("token/{token}")]
+    [HttpGet("Token/{token}")]
     public IActionResult GetAccountByToken(string token)
     {
         AccountDto? accountDto = _mapper.Map<AccountDto>(_accountRepository.GetAccountByToken(token));
+
+        if (accountDto == null)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(accountDto);
+    }
+    
+    [HttpGet("TemporaryToken/{temporaryToken}")]
+    public IActionResult GetAccountByTemporaryToken(string temporaryToken)
+    {
+        AccountDto? accountDto = _mapper.Map<AccountDto>(_accountRepository.GetAccountByTemporaryToken(temporaryToken));
 
         if (accountDto == null)
         {
@@ -68,7 +86,7 @@ public class AccountsController : ControllerBase
     //     return Ok(productsDto);
     // }
 
-    [HttpGet("{id:int}/users")]
+    [HttpGet("{id:int}/Users")]
     public IActionResult GetAccountUsers(int id)
     {
         Account? account = _accountRepository.GetAccountWithUsers(id);
@@ -124,7 +142,7 @@ public class AccountsController : ControllerBase
         return NoContent();
     }
 
-    [HttpPut("{accountId:int}/user/{userId:int}")]
+    [HttpPut("{accountId:int}/User/{userId:int}")]
     public IActionResult UpdateAccountUserConnection([FromRoute] int accountId, [FromRoute] int userId, [FromBody] AccountUserDto accountUserDto)
     {
         AccountUser? accountUser = _accountRepository.FindAccountUser(accountId, userId);

@@ -24,6 +24,11 @@ public class AccountRepository : IAccountRepository
         return _context.Accounts.FirstOrDefault(a => a.Token == token);
     }
 
+    public Account? GetAccountByTemporaryToken(string temporaryToken)
+    {
+        return _context.Accounts.FirstOrDefault(a => a.TemporaryToken == temporaryToken);
+    }
+
     public Account? GetAccountWithUsers(int id)
     {
         Account? account = _context.Accounts

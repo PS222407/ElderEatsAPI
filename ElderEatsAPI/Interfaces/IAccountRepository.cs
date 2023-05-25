@@ -7,6 +7,8 @@ public interface IAccountRepository
     public Account? GetAccount(int id);
     
     public Account? GetAccountByToken(string token);
+    
+    public Account? GetAccountByTemporaryToken(string temporaryToken);
 
     public Account? GetAccountWithUsers(int id);
 
