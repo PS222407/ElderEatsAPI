@@ -14,7 +14,8 @@ public class MappingProfiles : Profile
         CreateMap<ProductDto, Product>();
         CreateMap<User, UserDto>();
         CreateMap<UserDto, User>();
-        CreateMap<UserRegistrationDto, User>();
+        CreateMap<UserRegistrationPostDto, User>();
+        CreateMap<User, UserRegistrationDto>();
         CreateMap<AccountUserDto, AccountUser>();
         CreateMap<ProductPostDto, Product>();
     }

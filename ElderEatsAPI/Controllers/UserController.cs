@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ElderEatsAPI.Dto;
+using ElderEatsAPI.Dto.Validation;
 using ElderEatsAPI.Interfaces;
 using ElderEatsAPI.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -19,12 +20,17 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult Register(UserRegistrationDto userRegistrationDto)
+    public IActionResult Register([FromBody] UserRegistrationPostDto userRegistrationPostDto)
     {
-        User user = _mapper.Map<User>(userRegistrationDto);
+        User user = _mapper.Map<User>(userRegistrationPostDto);
 
-        _userRepository.Register(user);
+        UserValidationDto userValidationDto = _userRepository.Register(user);
+        if (userValidationDto.Reason != null)
+        {
+            ModelState.AddModelError("", userValidationDto.Reason);
+            return BadRequest(ModelState);
+        }
 
-        return Ok(user);
+        return Ok(_mapper.Map<UserRegistrationDto>(user));
     }
 }
