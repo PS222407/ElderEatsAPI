@@ -70,6 +70,15 @@ public class AccountRepository : IAccountRepository
         return _context.AccountProducts.Where(ap => ap.AccountId == id).Select(p => p.Product).ToList();
     }
 
+    public List<Product> GetAccountActiveProducts(int id)
+    {
+        return _context.AccountProducts
+            .Where(ap => ap.AccountId == id )
+            .Where(ap=>ap.ExpirationDate > DateTime.Now || ap.ExpirationDate == null)
+            .Select(p => p.Product)
+            .ToList();
+    }
+
     public Account? StoreAccount(Account account)
     {
         account.CreatedAt = DateTime.Now;

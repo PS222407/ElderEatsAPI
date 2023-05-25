@@ -80,6 +80,24 @@ public class ProductsController : ControllerBase
 
         return Ok(productPaginatedViewModel);
     }
+    
+    [HttpGet("product/{barcode}")]
+    public IActionResult GetProductByBarcode(string barcode)
+    {
+        ProductDto productDto = _mapper.Map<ProductDto>(_productRepository.GetProductByBarcode(barcode));
+
+        if (productDto == null)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(productDto);
+    }
 
     // // PUT: api/Products/5
     // // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -127,24 +145,31 @@ public class ProductsController : ControllerBase
         return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
     }
 
-    // // DELETE: api/Products/5
-    // [HttpDelete("{id}")]
-    // public async Task<IActionResult> DeleteProduct(long id)
+    // [HttpDelete]
+    // public IActionResult DeleteProduct(string barcode)
     // {
-    //     var product = await _context.Products.FindAsync(id);
+    //     Product product = _productRepository.GetProductByBarcode(barcode);
+    //    
+    //     
     //     if (product == null)
     //     {
     //         return NotFound();
     //     }
     //
-    //     _context.Products.Remove(product);
-    //     await _context.SaveChangesAsync();
+    //     if (!ModelState.IsValid)
+    //     {
+    //         return BadRequest(ModelState);
+    //     }
+    //
+    //     if (! _productRepository.DeleteProduct(product))
+    //     {
+    //         ModelState.AddModelError("", "Error while deleting product to database");
+    //         
+    //         return StatusCode(500, ModelState);
+    //     }
     //
     //     return NoContent();
-    // }
     //
-    // private bool ProductExists(long id)
-    // {
-    //     return (_context.Products?.Any(e => e.Id == id)).GetValueOrDefault();
     // }
+ 
 }

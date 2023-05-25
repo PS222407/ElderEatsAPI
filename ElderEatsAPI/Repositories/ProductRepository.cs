@@ -24,6 +24,11 @@ public class ProductRepository : IProductRepository
         return _context.Products.FirstOrDefault(p => p.Id == id);
     }
 
+    public Product? GetProductByBarcode(string barcode)
+    {
+        return _context.Products.FirstOrDefault(p => p.Barcode == barcode);
+    }
+
     public ProductPaginateDto SearchProductsByNamePaginated(string? name, int? skip, int? take)
     {
         IQueryable<Product> query = _context.Products.Where(p => p.Name.Contains(name != null ? name.Trim() : ""));

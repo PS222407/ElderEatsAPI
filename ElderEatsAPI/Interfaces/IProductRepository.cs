@@ -11,5 +11,7 @@ public interface IProductRepository
 
     public ProductPaginateDto SearchProductsByNamePaginated(string? name, int? skip, int? take);
 
+    public Product? GetProductByBarcode(string barcode);
+
     public bool StoreProduct(Product product);
 }

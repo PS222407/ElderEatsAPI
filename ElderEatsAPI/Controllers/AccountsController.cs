@@ -86,6 +86,19 @@ public class AccountsController : ControllerBase
     //
     //     return Ok(productsDto);
     // }
+    
+    [HttpGet("account/{id:int}/Products/Active")]
+    public IActionResult GetAccountActiveProducts(int id)
+    {
+        List<ProductDto> productsDto = _mapper.Map<List<ProductDto>>(_accountRepository.GetAccountActiveProducts(id));
+    
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+    
+        return Ok(productsDto);
+    }
 
     [AccountAuthFilter("employee")]
     [HttpGet("{id:int}/Users")]
