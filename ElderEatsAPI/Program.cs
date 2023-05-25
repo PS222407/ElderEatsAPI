@@ -2,22 +2,26 @@ using ElderEatsAPI.Data;
 using ElderEatsAPI.Interfaces;
 using ElderEatsAPI.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
-builder.Services.AddControllers()
-    .AddNewtonsoftJson();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
+builder.Services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var serverVersion = new MySqlServerVersion(new Version(8, 0, 24));
-builder.Services.AddDbContext<DataContext>(opt =>
-    opt.UseMySql(connectionString, serverVersion));
+builder.Services.AddDbContext<DataContext>(opt => opt.UseMySql(connectionString, serverVersion));
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
