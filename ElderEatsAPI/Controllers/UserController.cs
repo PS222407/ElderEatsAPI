@@ -4,6 +4,7 @@ using ElderEatsAPI.Dto.Validation;
 using ElderEatsAPI.Interfaces;
 using ElderEatsAPI.Middleware;
 using ElderEatsAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ElderEatsAPI.Controllers;
@@ -36,9 +37,15 @@ public class UserController : ControllerBase
         return Ok(_mapper.Map<UserRegistrationDto>(userValidationDto.User));
     }
     
+    [Authorize(Policy = "iPad")]
     [HttpPost("Login")]
     public IActionResult Login([FromBody] UserLoginPostDto userLoginPostDto)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        
         User user = _mapper.Map<User>(userLoginPostDto);
 
         UserValidationDto userValidationDto = _userRepository.Login(user);

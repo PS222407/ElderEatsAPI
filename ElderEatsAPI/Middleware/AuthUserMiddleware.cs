@@ -1,13 +1,12 @@
-﻿using System.Text.Json;
-using ElderEatsAPI.Auth;
+﻿using System.Security.Claims;
 using ElderEatsAPI.Interfaces;
-using ElderEatsAPI.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace ElderEatsAPI.Middleware;
 
-public class AuthUserMiddleware : IAuthorizationFilter
+public class AuthUserMiddleware : IAsyncAuthorizationFilter
 {
     private const string TokenName = "token";
     
@@ -18,49 +17,25 @@ public class AuthUserMiddleware : IAuthorizationFilter
         _userRepository = userRepository;
     }
 
-    public void OnAuthorization(AuthorizationFilterContext context)
+    public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
-        // var requestBody = string.Empty;
-        //
-        // using (var reader = new StreamReader(context.HttpContext.Request.Body))
-        // {
-        //     requestBody = reader.ReadToEnd();
-        //     context.HttpContext.Request.Body.Position = 0;
-        // }
-        //
-        // var jsonDocument = JsonDocument.Parse(requestBody);
-        //
-        // if (!jsonDocument.RootElement.TryGetProperty(TokenName, out var extractedToken))
-        // {
-        //     context.Result = new UnauthorizedObjectResult("Token is missing");
-        //     return;
-        // }
-        //
-        // var tokenValue = extractedToken.ToString();
-        // System.Diagnostics.Debug.Write(tokenValue);
-        //
-        // context.Result = new UnauthorizedObjectResult(tokenValue);
-        // return;
+        if (context.HttpContext.Request.Headers.TryGetValue("x-api-key", out var apiKey))
+        {
+            var claims = new List<Claim>
+            {
+                new Claim("email", "jens@ramakers.nl"),
+                new Claim("DeIpad", "A4"),
+            };
 
-        var originalBody = context.HttpContext.Request.Body;
-        var requestBody = Task.Run(async () => await new StreamReader(context.HttpContext.Request.Body).ReadToEndAsync()).GetAwaiter().GetResult();
-        context.HttpContext.Request.Body = originalBody;
-        // var jsonDocument = JsonDocument.Parse(requestBody);
-        
-        // if (!jsonDocument.RootElement.TryGetProperty(TokenName, out var extractedToken))
-        // {
-        //     context.Result = new UnauthorizedObjectResult("Token is missing");
-        //     return;
-        // }
-        
-        // User? user = _userRepository.AuthorizeWithToken(extractedToken.ToString());
-        // if (user == null)
-        // {
-        //     context.Result = new UnauthorizedObjectResult("Invalid token");
-        //     return;
-        // }
-        //
-        // Identity.User = user;
-        // return;
+            var identity = new ClaimsIdentity(claims, "MyAuthenticationScheme");
+
+            var principal = new ClaimsPrincipal(identity);
+
+            await context.HttpContext.SignInAsync(principal);
+        }
+        else
+        {
+            context.Result = new UnauthorizedObjectResult("invalid token");
+        }
     }
 }
