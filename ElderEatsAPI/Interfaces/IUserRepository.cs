@@ -7,5 +7,7 @@ public interface IUserRepository
 {
     public UserValidationDto Register(User user);
 
-    public User? Login(User user);
+    public UserValidationDto Login(User user);
+
+    public User? AuthorizeWithToken(string? token);
 }

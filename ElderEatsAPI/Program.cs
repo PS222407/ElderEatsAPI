@@ -1,5 +1,6 @@
 using ElderEatsAPI.Data;
 using ElderEatsAPI.Interfaces;
+using ElderEatsAPI.Middleware;
 using ElderEatsAPI.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -22,6 +23,8 @@ builder.Services.AddDbContext<DataContext>(opt => opt.UseMySql(connectionString,
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<AuthUserMiddleware>();
 
 var app = builder.Build();
 

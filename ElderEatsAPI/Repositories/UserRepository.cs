@@ -17,13 +17,14 @@ public class UserRepository : IUserRepository
     public UserValidationDto Register(User user)
     {
         UserValidationDto userValidationDto = new UserValidationDto();
-        if (UserExistsByEmail(user.Email))
+        if (FindUserByEmail(user.Email) != null)
         {
-            userValidationDto.Reason = "Email is already taken";
+            userValidationDto.Reason = "Email is already taken, please go to login";
             return userValidationDto;
         }
         
         user.Token = Guid.NewGuid().ToString();
+        user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
         _context.Users.Add(user);
 
         if (!Save())
@@ -36,14 +37,34 @@ public class UserRepository : IUserRepository
         return userValidationDto;
     }
 
-    public User? Login(User user)
+    public UserValidationDto Login(User user)
     {
-        throw new NotImplementedException();
+        UserValidationDto userValidationDto = new UserValidationDto();
+        User? userDb = FindUserByEmail(user.Email);
+        if (userDb == null)
+        {
+            userValidationDto.Reason = "User not found, please register first";
+            return userValidationDto;
+        }
+
+        if (!BCrypt.Net.BCrypt.Verify(user.Password, userDb.Password))
+        {
+            userValidationDto.Reason = "Invalid credentials";
+            return userValidationDto;
+        }
+
+        userValidationDto.User = userDb;
+        return userValidationDto;
     }
 
-    private bool UserExistsByEmail(string email)
+    public User? AuthorizeWithToken(string? token)
     {
-        return _context.Users.Any(u => u.Email == email);
+        return token == null ? null : _context.Users.FirstOrDefault(u => u.Token == token);
+    }
+
+    private User? FindUserByEmail(string email)
+    {
+        return _context.Users.FirstOrDefault(u => u.Email == email);
     }
 
     private bool Save()

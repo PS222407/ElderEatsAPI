@@ -10,15 +10,11 @@ public class UserDto
 
     public string Email { get; set; }
 
-    [Column("email_verified_at")]
     public DateTime? EmailVerifiedAt { get; set; }
 
-    [Column("remember_token")]
     public string? RememberToken { get; set; }
 
-    [Column("created_at")]
     public DateTime? CreatedAt { get; set; }
     
-    [Column("updated_at")]
     public DateTime? UpdatedAt { get; set; }
 }
