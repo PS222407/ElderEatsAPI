@@ -9,5 +9,5 @@ public interface IUserRepository
 
     public UserValidationDto Login(User user);
 
-    public User? AuthorizeWithToken(string? token);
+    public User? GetUserByToken(string? token);
 }

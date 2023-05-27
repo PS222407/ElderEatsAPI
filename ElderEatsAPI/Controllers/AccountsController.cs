@@ -3,6 +3,7 @@ using ElderEatsAPI.Models;
 using ElderEatsAPI.Interfaces;
 using ElderEatsAPI.Dto;
 using AutoMapper;
+using ElderEatsAPI.Middleware;
 
 namespace ElderEatsAPI.Controllers;
 
@@ -86,6 +87,7 @@ public class AccountsController : ControllerBase
     //     return Ok(productsDto);
     // }
 
+    [AccountAuthFilter("employee")]
     [HttpGet("{id:int}/Users")]
     public IActionResult GetAccountUsers(int id)
     {

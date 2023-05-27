@@ -57,7 +57,7 @@ public class UserRepository : IUserRepository
         return userValidationDto;
     }
 
-    public User? AuthorizeWithToken(string? token)
+    public User? GetUserByToken(string? token)
     {
         return token == null ? null : _context.Users.FirstOrDefault(u => u.Token == token);
     }

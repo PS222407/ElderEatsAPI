@@ -7,4 +7,6 @@ public static class Identity
     public static User? User;
 
     public static Account? Account;
+
+    public static bool ApiKeyMissing = false;
 }

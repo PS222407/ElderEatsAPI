@@ -2,15 +2,12 @@
 using ElderEatsAPI.Dto;
 using ElderEatsAPI.Dto.Validation;
 using ElderEatsAPI.Interfaces;
-using ElderEatsAPI.Middleware;
 using ElderEatsAPI.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ElderEatsAPI.Controllers;
 
 [Route("api/[controller]")]
-[ServiceFilter(typeof(AuthUserMiddleware))]
 public class UserController : ControllerBase
 {
     private readonly IUserRepository _userRepository;
@@ -36,8 +33,7 @@ public class UserController : ControllerBase
 
         return Ok(_mapper.Map<UserRegistrationDto>(userValidationDto.User));
     }
-    
-    [Authorize(Policy = "iPad")]
+
     [HttpPost("Login")]
     public IActionResult Login([FromBody] UserLoginPostDto userLoginPostDto)
     {

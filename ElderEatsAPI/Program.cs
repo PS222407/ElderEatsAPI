@@ -1,9 +1,7 @@
-using ElderEatsAPI.Auth;
 using ElderEatsAPI.Data;
 using ElderEatsAPI.Interfaces;
 using ElderEatsAPI.Middleware;
 using ElderEatsAPI.Repositories;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
@@ -11,20 +9,6 @@ using Newtonsoft.Json;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Services.AddControllers();
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("iPad", policy =>
-    {
-        policy.RequireAuthenticatedUser();
-        policy.RequireClaim("DeIpad");
-    });
-});
-//
-// builder.Services.AddAuthentication("MyAuthenticationScheme")
-//     .AddCookie("MyAuthenticationScheme");
-
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
@@ -64,7 +48,6 @@ builder.Services.AddSwaggerGen(c =>
     c.AddSecurityRequirement(requirement);
 });
 
-builder.Services.AddScoped<AuthUserMiddleware>();
 
 var app = builder.Build();
 
@@ -77,7 +60,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication();
+app.UseMiddleware<AuthMiddleware>();
 
 app.UseAuthorization();
 
