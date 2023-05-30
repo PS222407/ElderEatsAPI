@@ -24,4 +24,6 @@ public class Product
     public DateTime? UpdatedAt { get; set; }
 
     public List<AccountProduct>? AccountProducts { get; set; }
+
+    public List<FixedProduct> FixedProducts { get; set; }
 }

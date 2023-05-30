@@ -9,4 +9,6 @@ public interface IProductRepository
     public Product? GetProduct(int id);
 
     public bool StoreProduct(Product product);
+
+    
 }

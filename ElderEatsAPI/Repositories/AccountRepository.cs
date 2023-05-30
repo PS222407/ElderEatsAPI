@@ -1,7 +1,9 @@
 ﻿using ElderEatsAPI.Data;
+using ElderEatsAPI.Dto;
 using ElderEatsAPI.Interfaces;
 using ElderEatsAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 
 namespace ElderEatsAPI.Repositories;
 
@@ -82,6 +84,75 @@ public class AccountRepository : IAccountRepository
 
     private bool Save()
     {
+        
+
         return _context.SaveChanges() > 0;
     }
+
+    public bool AddProductToAccount(AccountProduct accountProductDto)
+    {
+
+        accountProductDto.UpdatedAt = DateTime.Now;
+        accountProductDto.CreatedAt= DateTime.Now;
+
+        _context.Add(accountProductDto);
+
+        return Save() ? true : false;
+    }
+
+    public bool AccountProductRanOut(int AccountProductID)
+    {
+        AccountProduct? ap = _context.AccountProducts.FirstOrDefault(ap => ap.Id == AccountProductID);
+
+        if (ap != null)
+        {
+            ap.RanOutAt = DateTime.Now;
+            ap.UpdatedAt= DateTime.Now;
+            Save();
+
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public bool AccountProductExists(int AccountProductID)
+    {
+        AccountProduct? ap = _context.AccountProducts.FirstOrDefault(ap => ap.Id == AccountProductID);
+
+        if(ap != null)
+        {
+            return false;
+        }else
+        {
+            return true;
+        }
+
+    }
+
+    public FixedProduct StoreFixedProduct(int AccountID, int ProductID)
+    {
+        FixedProduct fixedProduct = new FixedProduct();
+
+        fixedProduct.ProductId = ProductID;
+        fixedProduct.AccountId = AccountID;
+        fixedProduct.isActive = true;
+        fixedProduct.UpdatedAt= DateTime.Now;
+        fixedProduct.CreatedAt= DateTime.Now;
+
+        _context.FixedProducts.Add(fixedProduct);
+        _context.SaveChanges();
+
+        return fixedProduct;
+
+
+    }
+
+    public bool ProductExists(int id)
+    {
+        return _context.Products.Any(a => a.Id == id);
+    }
+
 }

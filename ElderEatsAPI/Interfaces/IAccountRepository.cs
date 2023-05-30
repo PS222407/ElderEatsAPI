@@ -1,4 +1,5 @@
-﻿using ElderEatsAPI.Models;
+﻿using ElderEatsAPI.Dto;
+using ElderEatsAPI.Models;
 
 namespace ElderEatsAPI.Interfaces;
 
@@ -23,4 +24,13 @@ public interface IAccountRepository
     public AccountUser? FindAccountUser(int accountId, int userId);
 
     public bool AccountExists(int id);
+
+    public bool AddProductToAccount(AccountProduct accountProduct);
+
+    public bool AccountProductExists(int AccountProductID);
+    public bool AccountProductRanOut(int AccountProductID);
+
+    public FixedProduct? StoreFixedProduct(int AccountID, int ProductID);
+
+    public bool ProductExists(int productID);
 }
