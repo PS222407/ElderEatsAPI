@@ -48,7 +48,7 @@ public class AccountRepository : IAccountRepository
             .Include(a => a.AccountUsers
                 .Where(au => au.Status == (int)ConnectionStatus.Connected))
             .ThenInclude(au => au.User)
-            .FirstOrDefault();      
+            .FirstOrDefault();
 
         return account;
     }
@@ -73,8 +73,8 @@ public class AccountRepository : IAccountRepository
     public List<Product> GetAccountActiveProducts(int id)
     {
         return _context.AccountProducts
-            .Where(ap => ap.AccountId == id )
-            .Where(ap=>ap.ExpirationDate > DateTime.Now || ap.ExpirationDate == null)
+            .Where(ap => ap.AccountId == id)
+            .Where(ap => ap.ExpirationDate > DateTime.Now || ap.ExpirationDate == null)
             .Select(p => p.Product)
             .ToList();
     }
@@ -124,6 +124,67 @@ public class AccountRepository : IAccountRepository
     public bool AccountExists(int id)
     {
         return _context.Accounts.Any(a => a.Id == id);
+    }
+
+    public bool AddProductToAccount(AccountProduct accountProductDto)
+    {
+        accountProductDto.UpdatedAt = DateTime.Now;
+        accountProductDto.CreatedAt = DateTime.Now;
+
+        _context.Add(accountProductDto);
+
+        return Save();
+    }
+
+    public bool AccountProductRanOut(int AccountProductID)
+    {
+        AccountProduct? ap = _context.AccountProducts.FirstOrDefault(ap => ap.Id == AccountProductID);
+
+        if (ap == null)
+        {
+            return false;
+        }
+
+        ap.RanOutAt = DateTime.Now;
+        ap.UpdatedAt = DateTime.Now;
+        Save();
+
+        return true;
+    }
+
+    public bool AccountProductExists(int AccountProductID)
+    {
+        AccountProduct? ap = _context.AccountProducts.FirstOrDefault(ap => ap.Id == AccountProductID);
+
+        if (ap != null)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    public FixedProduct StoreFixedProduct(int AccountID, int ProductID)
+    {
+        FixedProduct fixedProduct = new FixedProduct();
+
+        fixedProduct.ProductId = ProductID;
+        fixedProduct.AccountId = AccountID;
+        fixedProduct.isActive = true;
+        fixedProduct.UpdatedAt = DateTime.Now;
+        fixedProduct.CreatedAt = DateTime.Now;
+
+        _context.FixedProducts.Add(fixedProduct);
+        _context.SaveChanges();
+
+        return fixedProduct;
+    }
+
+    public bool ProductExists(int id)
+    {
+        return _context.Products.Any(a => a.Id == id);
     }
 
     private bool Save()
