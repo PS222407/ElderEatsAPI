@@ -12,9 +12,13 @@ public class User
 
     [Column("email_verified_at")]
     public DateTime? EmailVerifiedAt { get; set; }
+    
+    public string Token { get; set; }
 
     [Column("remember_token")]
     public string? RememberToken { get; set; }
+
+    public string Password { get; set; }
 
     [Column("created_at")]
     public DateTime? CreatedAt { get; set; }

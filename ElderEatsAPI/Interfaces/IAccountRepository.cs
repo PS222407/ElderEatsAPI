@@ -7,8 +7,14 @@ public interface IAccountRepository
     public Account? GetAccount(int id);
     
     public Account? GetAccountByToken(string token);
+    
+    public Account? GetAccountByTemporaryToken(string temporaryToken);
 
     public Account? GetAccountWithUsers(int id);
+    
+    public Account? GetAccountWithConnectedUsers(int id);
+    
+    public Account? GetAccountWithProcessingUsers(int id);
 
     public List<Product> GetAccountProducts(int id);
 
@@ -19,6 +25,8 @@ public interface IAccountRepository
     public bool UpdateAccountUserConnection(AccountUser accountUser);
     
     public bool AccountUserExists(int accountId, int userId);
+    
+    public bool DetachAccountUser(AccountUser accountUser);
 
     public AccountUser? FindAccountUser(int accountId, int userId);
 
