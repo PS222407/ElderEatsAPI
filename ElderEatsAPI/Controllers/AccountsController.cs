@@ -6,6 +6,8 @@ using ElderEatsAPI.Auth;
 using ElderEatsAPI.Middleware;
 using ElderEatsAPI.Requests;
 using ElderEatsAPI.ViewModels;
+using Microsoft.CodeAnalysis;
+using ElderEatsAPI.Dto;
 
 namespace ElderEatsAPI.Controllers;
 
@@ -201,9 +203,69 @@ public class AccountsController : ControllerBase
         if (!_accountRepository.DetachAccountUser(accountUser))
         {
             ModelState.AddModelError("", "Detaching user went wrong");
+            return StatusCode(500, ModelState);
+        }
+
+        return NoContent();
+    }
+    [HttpPut("{accountId:int}/products/{productId:int}/create")]
+    public IActionResult CreateAccountProductConnection([FromRoute] int accountId, [FromRoute] int productId)
+    {
+        AccountProductDto accountProductDto = new AccountProductDto();
+
+        accountProductDto.AccountId = accountId;
+        accountProductDto.ProductId = productId;
+
+        if (!ModelState.IsValid)
+            return BadRequest();
+
+
+        if (!_accountRepository.AddProductToAccount(_mapper.Map<AccountProduct>(accountProductDto)))
+        {
+            ModelState.AddModelError("", "Adding product went wrong");
 
             return StatusCode(500, ModelState);
         }
+
+        return NoContent();
+    }
+
+    [HttpPut("products/{connectionID:int}/ranout")]
+    public IActionResult AccountProductRanout([FromRoute] int connectionID)
+    {
+
+        if (!ModelState.IsValid)
+            return BadRequest();
+
+
+        if (!_accountRepository.AccountProductRanOut(connectionID))
+        {
+            ModelState.AddModelError("", "Adding product went wrong");
+
+            return StatusCode(500, ModelState);
+        }
+
+        return NoContent();
+    }
+
+    [HttpPut("{accountId:int}/fixedproducts/{productid:int}/ranout")]
+    public IActionResult AddFixedProduct([FromRoute] int accountId, [FromRoute] int productid)
+    {
+
+        if (!ModelState.IsValid)
+            return BadRequest();
+        if(!_accountRepository.AccountExists(accountId) || !_accountRepository.ProductExists(productid))
+        {
+            ModelState.AddModelError("", "Adding fixed product went wrong");
+
+            return StatusCode(500, ModelState);
+        }
+        else
+        {
+            _accountRepository.StoreFixedProduct(accountId, productid);
+        }
+
+
 
         return NoContent();
     }

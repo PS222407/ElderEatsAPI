@@ -1,8 +1,10 @@
 ﻿using ElderEatsAPI.Data;
 using ElderEatsAPI.Enums;
+using ElderEatsAPI.Dto;
 using ElderEatsAPI.Interfaces;
 using ElderEatsAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 
 namespace ElderEatsAPI.Repositories;
 
@@ -158,22 +160,6 @@ public class AccountRepository : IAccountRepository
         return ap == null;
     }
 
-    public FixedProduct StoreFixedProduct(int accountId, int productId)
-    {
-        FixedProduct fixedProduct = new FixedProduct();
-
-        fixedProduct.ProductId = productId;
-        fixedProduct.AccountId = accountId;
-        fixedProduct.isActive = true;
-        fixedProduct.UpdatedAt = DateTime.Now;
-        fixedProduct.CreatedAt = DateTime.Now;
-
-        _context.FixedProducts.Add(fixedProduct);
-        _context.SaveChanges();
-
-        return fixedProduct;
-    }
-
     public bool ProductExists(int id)
     {
         return _context.Products.Any(a => a.Id == id);
@@ -181,6 +167,27 @@ public class AccountRepository : IAccountRepository
 
     private bool Save()
     {
+        
+
         return _context.SaveChanges() > 0;
     }
+
+    public FixedProduct StoreFixedProduct(int AccountID, int ProductID)
+    {
+        FixedProduct fixedProduct = new FixedProduct();
+
+        fixedProduct.ProductId = ProductID;
+        fixedProduct.AccountId = AccountID;
+        fixedProduct.isActive = true;
+        fixedProduct.UpdatedAt= DateTime.Now;
+        fixedProduct.CreatedAt= DateTime.Now;
+
+        _context.FixedProducts.Add(fixedProduct);
+        _context.SaveChanges();
+
+        return fixedProduct;
+
+
+    }
+
 }
