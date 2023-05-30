@@ -14,4 +14,6 @@ public interface IProductRepository
     public Product? GetProductByBarcode(string barcode);
 
     public bool StoreProduct(Product product);
+    
+    public bool DeleteProductFromAccountById(int id);
 }

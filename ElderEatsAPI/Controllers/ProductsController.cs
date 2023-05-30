@@ -145,31 +145,18 @@ public class ProductsController : ControllerBase
         return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
     }
 
-    // [HttpDelete]
-    // public IActionResult DeleteProduct(string barcode)
-    // {
-    //     Product product = _productRepository.GetProductByBarcode(barcode);
-    //    
-    //     
-    //     if (product == null)
-    //     {
-    //         return NotFound();
-    //     }
-    //
-    //     if (!ModelState.IsValid)
-    //     {
-    //         return BadRequest(ModelState);
-    //     }
-    //
-    //     if (! _productRepository.DeleteProduct(product))
-    //     {
-    //         ModelState.AddModelError("", "Error while deleting product to database");
-    //         
-    //         return StatusCode(500, ModelState);
-    //     }
-    //
-    //     return NoContent();
-    //
-    // }
+    [HttpDelete]
+    public IActionResult DeleteProductFromAccountById(int id)
+    {
+        if (! _productRepository.DeleteProductFromAccountById(id))
+        {
+            ModelState.AddModelError("", "Error while deleting product to database");
+            
+            return StatusCode(500, ModelState);
+        }
+    
+        return NoContent();
+    
+    }
  
 }

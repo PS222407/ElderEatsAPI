@@ -1,4 +1,5 @@
-﻿using ElderEatsAPI.Data;
+using ElderEatsAPI.Auth;
+using ElderEatsAPI.Data;
 using ElderEatsAPI.Dto;
 using ElderEatsAPI.Interfaces;
 using ElderEatsAPI.Models;
@@ -60,6 +61,19 @@ public class ProductRepository : IProductRepository
         product.UpdatedAt = DateTime.Now;
         _context.Add(product);
 
+        return Save();
+    }
+
+    public bool DeleteProductFromAccountById(int id)
+    {
+        AccountProduct? accountProduct = _context.AccountProducts.FirstOrDefault(ap => ap.Id == id);
+
+        if (accountProduct == null)
+        {
+            return false;
+        }
+        _context.Remove(accountProduct);
+        
         return Save();
     }
 
