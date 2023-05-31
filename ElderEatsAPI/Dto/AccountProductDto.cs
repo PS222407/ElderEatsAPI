@@ -1,12 +1,9 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using ElderEatsAPI.Enums;
 
 namespace ElderEatsAPI.Dto;
 
 public class AccountProductDto
 {
-
     [Column(" account_id")]
     public long AccountId { get; set; }
 

@@ -5,7 +5,6 @@ using ElderEatsAPI.Dto;
 using AutoMapper;
 using ElderEatsAPI.Middleware;
 using ElderEatsAPI.ViewModels;
-using Microsoft.CodeAnalysis;
 
 namespace ElderEatsAPI.Controllers;
 
@@ -57,7 +56,7 @@ public class AccountsController : ControllerBase
 
         return Ok(accountDto);
     }
-    
+
     [HttpGet("TemporaryToken/{temporaryToken}")]
     public IActionResult GetAccountByTemporaryToken(string temporaryToken)
     {
@@ -88,17 +87,17 @@ public class AccountsController : ControllerBase
     //
     //     return Ok(productsDto);
     // }
-    
+
     [HttpGet("account/{id:int}/Products/Active")]
     public IActionResult GetAccountActiveProducts(int id)
     {
         List<ProductViewModel> productsDto = _mapper.Map<List<ProductViewModel>>(_accountRepository.GetAccountActiveProducts(id));
-    
+
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
-    
+
         return Ok(productsDto);
     }
 
@@ -112,6 +111,7 @@ public class AccountsController : ControllerBase
         {
             return NotFound();
         }
+
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
@@ -119,7 +119,7 @@ public class AccountsController : ControllerBase
 
         return Ok(account);
     }
-    
+
     [HttpGet("{id:int}/Users/Connected")]
     public IActionResult GetAccountConnectedUsers(int id)
     {
@@ -129,6 +129,7 @@ public class AccountsController : ControllerBase
         {
             return NotFound();
         }
+
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
@@ -136,7 +137,7 @@ public class AccountsController : ControllerBase
 
         return Ok(account);
     }
-    
+
     [HttpGet("{id:int}/Users/InProcess")]
     public IActionResult GetAccountInProcessUsers(int id)
     {
@@ -146,6 +147,7 @@ public class AccountsController : ControllerBase
         {
             return NotFound();
         }
+
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
@@ -164,7 +166,7 @@ public class AccountsController : ControllerBase
         if (account == null)
         {
             ModelState.AddModelError("", "Storing account went wrong");
-        
+
             return StatusCode(500, ModelState);
         }
 
@@ -259,7 +261,6 @@ public class AccountsController : ControllerBase
     [HttpPut("products/{connectionID:int}/ranout")]
     public IActionResult AccountProductRanout([FromRoute] int connectionID)
     {
-
         if (!ModelState.IsValid)
             return BadRequest();
 
@@ -277,21 +278,16 @@ public class AccountsController : ControllerBase
     [HttpPut("{accountId:int}/fixedproducts/{productid:int}/ranout")]
     public IActionResult AddFixedProduct([FromRoute] int accountId, [FromRoute] int productid)
     {
-
         if (!ModelState.IsValid)
             return BadRequest();
-        if(!_accountRepository.AccountExists(accountId) || !_accountRepository.ProductExists(productid))
+        if (!_accountRepository.AccountExists(accountId) || !_accountRepository.ProductExists(productid))
         {
             ModelState.AddModelError("", "Adding fixed product went wrong");
 
             return StatusCode(500, ModelState);
         }
-        else
-        {
-            _accountRepository.StoreFixedProduct(accountId, productid);
-        }
 
-
+        _accountRepository.StoreFixedProduct(accountId, productid);
 
         return NoContent();
     }

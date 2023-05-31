@@ -136,9 +136,9 @@ public class AccountRepository : IAccountRepository
         return Save();
     }
 
-    public bool AccountProductRanOut(int AccountProductID)
+    public bool AccountProductRanOut(int accountProductId)
     {
-        AccountProduct? ap = _context.AccountProducts.FirstOrDefault(ap => ap.Id == AccountProductID);
+        AccountProduct? ap = _context.AccountProducts.FirstOrDefault(ap => ap.Id == accountProductId);
 
         if (ap == null)
         {
@@ -147,31 +147,23 @@ public class AccountRepository : IAccountRepository
 
         ap.RanOutAt = DateTime.Now;
         ap.UpdatedAt = DateTime.Now;
-        Save();
 
-        return true;
+        return Save();
     }
 
-    public bool AccountProductExists(int AccountProductID)
+    public bool AccountProductExists(int accountProductId)
     {
-        AccountProduct? ap = _context.AccountProducts.FirstOrDefault(ap => ap.Id == AccountProductID);
+        AccountProduct? ap = _context.AccountProducts.FirstOrDefault(ap => ap.Id == accountProductId);
 
-        if (ap != null)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        return ap == null;
     }
 
-    public FixedProduct StoreFixedProduct(int AccountID, int ProductID)
+    public FixedProduct StoreFixedProduct(int accountId, int productId)
     {
         FixedProduct fixedProduct = new FixedProduct();
 
-        fixedProduct.ProductId = ProductID;
-        fixedProduct.AccountId = AccountID;
+        fixedProduct.ProductId = productId;
+        fixedProduct.AccountId = accountId;
         fixedProduct.isActive = true;
         fixedProduct.UpdatedAt = DateTime.Now;
         fixedProduct.CreatedAt = DateTime.Now;
