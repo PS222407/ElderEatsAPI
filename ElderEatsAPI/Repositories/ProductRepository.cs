@@ -22,12 +22,14 @@ public class ProductRepository : IProductRepository
 
     public List<Product> GetActiveProductsFromAccount()
     {
-        return _context.AccountProducts
+        var query = _context.AccountProducts
             .Where(ap => ap.AccountId == Identity.Account.Id && ap.RanOutAt > DateTime.Now)
             .OrderBy(ap => ap.ExpirationDate)
             .Select(ap => ap.Product)
             .ToList();
             //TODO: Add paginate 4. Add as method variable.
+
+            return query;
     }
 
     public Product? GetProduct(int id)
@@ -40,23 +42,14 @@ public class ProductRepository : IProductRepository
         return _context.Products.FirstOrDefault(p => p.Barcode == barcode);
     }
 
-    public ProductPaginateDto SearchProductsByNamePaginated(string? name, int? skip, int? take)
+    public ProductPaginateDto SearchProductsByNamePaginated(string? name, int skip, int take)
     {
         IQueryable<Product> query = _context.Products.Where(p => p.Name.Contains(name != null ? name.Trim() : ""));
         int count = query.Count();
-        
-        query = query.OrderByDescending(product => product.Id);
-
-        if (skip != null)
-        {
-            query = query.Skip(skip.Value);
-        }
-        if (take != null)
-        {
-            query = query.Take(take.Value);
-        }
-
-        var list = query.ToList();
+        var list = query.OrderByDescending(product => product.Id)
+            .Skip(skip)
+            .Take(take)
+            .ToList();
 
         return new ProductPaginateDto
         {
