@@ -6,6 +6,8 @@ namespace ElderEatsAPI.Interfaces;
 public interface IProductRepository
 {
     public List<Product> GetProducts();
+    
+    public List<Product> GetActiveProductsFromAccount();
 
     public Product? GetProduct(int id);
 
@@ -16,4 +18,6 @@ public interface IProductRepository
     public bool StoreProduct(Product product);
     
     public bool DeleteProductFromAccountById(int id);
+
+    public bool UpdateProductExpirationDateFromAccountById(int id, DateTime date);
 }

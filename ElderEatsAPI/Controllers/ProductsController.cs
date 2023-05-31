@@ -33,6 +33,19 @@ public class ProductsController : ControllerBase
 
         return Ok(productsDto);
     }
+    
+    [HttpGet("Accoount/{id}")]
+    public IActionResult GetActiveProductsFromAccount()
+    {
+        List<ProductDto> productsDto = _mapper.Map<List<ProductDto>>(_productRepository.GetActiveProductsFromAccount());
+    
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(productsDto);
+    }
 
     [HttpGet("{id}")]
     public IActionResult GetProduct(int id)
@@ -149,6 +162,20 @@ public class ProductsController : ControllerBase
     public IActionResult DeleteProductFromAccountById(int id)
     {
         if (! _productRepository.DeleteProductFromAccountById(id))
+        {
+            ModelState.AddModelError("", "Error while deleting product to database");
+            
+            return StatusCode(500, ModelState);
+        }
+    
+        return NoContent();
+    
+    }
+    
+    [HttpPut]
+    public IActionResult UpdateProductExpirationDateFromAccountById(int id, DateTime date)
+    {
+        if (! _productRepository.UpdateProductExpirationDateFromAccountById(id, date))
         {
             ModelState.AddModelError("", "Error while deleting product to database");
             
