@@ -9,12 +9,14 @@ public class MappingProfiles : Profile
 {
     public MappingProfiles()
     {
-        CreateMap<Account, AccountDto>();
-        CreateMap<AccountPostDto, Account>();
+        CreateMap<Account, AccountViewModel>();
+        CreateMap<AccountUser, AccountUserViewModel>();
+        CreateMap<AccountProduct, AccountProductViewModel>();
         CreateMap<Product, ProductViewModel>();
+        CreateMap<User, UserViewModel>();
+        
+        CreateMap<AccountPostDto, Account>();
         CreateMap<ProductViewModel, Product>();
-        CreateMap<User, UserDto>();
-        CreateMap<UserDto, User>();
         CreateMap<UserRegistrationPostDto, User>();
         CreateMap<UserLoginPostDto, User>();
         CreateMap<User, UserRegistrationDto>();

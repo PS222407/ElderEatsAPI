@@ -25,10 +25,7 @@ public class AuthMiddleware
         _userRepository = new UserRepository(context);
         _accountRepository = new AccountRepository(context);
         
-        if (!httpContext.Request.Headers.TryGetValue(TokenName, out var apiKey))
-        {
-            Identity.ApiKeyMissing = true;
-        }
+        Identity.ApiKeyMissing = !httpContext.Request.Headers.TryGetValue(TokenName, out var apiKey);
 
         User? user = _userRepository.GetUserByToken(apiKey);
         Account? account = _accountRepository.GetAccountByToken(apiKey!);

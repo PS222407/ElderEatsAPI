@@ -3,6 +3,8 @@ using ElderEatsAPI.Models;
 using ElderEatsAPI.Interfaces;
 using AutoMapper;
 using ElderEatsAPI.Dto;
+using ElderEatsAPI.Middleware;
+using ElderEatsAPI.Requests;
 using ElderEatsAPI.ViewModels;
 
 namespace ElderEatsAPI.Controllers;
@@ -34,7 +36,8 @@ public class ProductsController : ControllerBase
         return Ok(productsDto);
     }
 
-    [HttpGet("Account/{id}")]
+    [AccountAuthFilter("employee")]
+    [HttpGet("Account/{id:int}")]
     public IActionResult GetActiveProductsFromAccount(int take, int page)
     {
         if (page <= 0)
@@ -65,7 +68,7 @@ public class ProductsController : ControllerBase
         return Ok(productPaginatedViewModel);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public IActionResult GetProduct(int id)
     {
         ProductViewModel productViewModel = _mapper.Map<ProductViewModel>(_productRepository.GetProduct(id));
@@ -83,19 +86,20 @@ public class ProductsController : ControllerBase
         return Ok(productViewModel);
     }
 
-    [HttpGet("search/{name}")]
+    [HttpGet("Search/{name}")]
     public IActionResult SearchProductsPaginated(string? name, int take, int page)
     {
         if (page <= 0)
         {
             return BadRequest("Page cannot be 0 or less");
         }
+
         if (take <= 0)
         {
             return BadRequest("Take cannot be 0 or less");
         }
 
-        var productPaginateDto = _productRepository.SearchProductsByNamePaginated(name, take * (page - 1), take);
+        ProductPaginateDto productPaginateDto = _productRepository.SearchProductsByNamePaginated(name, take * (page - 1), take);
 
         int maxPages = (int)Math.Ceiling(productPaginateDto.Count / (float)take);
         if (page > maxPages)
@@ -112,12 +116,12 @@ public class ProductsController : ControllerBase
         return Ok(productPaginatedViewModel);
     }
 
-    [HttpGet("product/{barcode}")]
+    [HttpGet("Product/{barcode}")]
     public IActionResult GetProductByBarcode(string barcode)
     {
-        ProductViewModel productDto = _mapper.Map<ProductViewModel>(_productRepository.GetProductByBarcode(barcode));
+        ProductViewModel productViewModel = _mapper.Map<ProductViewModel>(_productRepository.GetProductByBarcode(barcode));
 
-        if (productDto == null)
+        if (productViewModel == null)
         {
             return NotFound();
         }
@@ -127,39 +131,8 @@ public class ProductsController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        return Ok(productDto);
+        return Ok(productViewModel);
     }
-
-    // // PUT: api/Products/5
-    // // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-    // [HttpPut("{id}")]
-    // public async Task<IActionResult> PutProduct([FromQuery] long id, [FromBody] Product product)
-    // {
-    //     if (id != product.Id)
-    //     {
-    //         return BadRequest();
-    //     }
-    //
-    //     _context.Entry(product).State = EntityState.Modified;
-    //
-    //     try
-    //     {
-    //         await _context.SaveChangesAsync();
-    //     }
-    //     catch (DbUpdateConcurrencyException)
-    //     {
-    //         if (!ProductExists(id))
-    //         {
-    //             return NotFound();
-    //         }
-    //         else
-    //         {
-    //             throw;
-    //         }
-    //     }
-    //
-    //     return NoContent();
-    // }
 
     [HttpPost]
     public IActionResult StoreProduct(ProductPostDto productPostDto)
@@ -176,27 +149,24 @@ public class ProductsController : ControllerBase
         return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
     }
 
-    [HttpDelete]
-    public IActionResult DeleteProductFromAccountById(int id)
+    [HttpPut("Account/{accountProductId:int}/ExpirationDate")]
+    public IActionResult UpdateProductExpirationDateFromAccountById([FromRoute] int accountProductId, [FromBody] AccountProductUpdateRequest accountProductUpdateRequest)
     {
-        if (!_productRepository.DeleteProductFromAccountById(id))
+        if (!_productRepository.UpdateProductExpirationDateFromAccountById(accountProductId, accountProductUpdateRequest.ExpirationDate))
         {
-            ModelState.AddModelError("", "Error while deleting product to database");
-
-            return StatusCode(500, ModelState);
+            return BadRequest("Error while updating product, check if the accountProductId is valid");
         }
 
         return NoContent();
     }
 
-    [HttpPut]
-    public IActionResult UpdateProductExpirationDateFromAccountById(int id, DateTime date)
-    {
-        if (!_productRepository.UpdateProductExpirationDateFromAccountById(id, date))
-        {
-            ModelState.AddModelError("", "Error while deleting product to database");
 
-            return StatusCode(500, ModelState);
+    [HttpDelete("Account/{accountProductId:int}")]
+    public IActionResult DeleteProductFromAccountById(int accountProductId)
+    {
+        if (!_productRepository.DeleteProductFromAccountById(accountProductId))
+        {
+            return BadRequest("Error while deleting product, check if the accountProductId is valid");
         }
 
         return NoContent();

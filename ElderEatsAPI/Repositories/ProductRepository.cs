@@ -75,9 +75,9 @@ public class ProductRepository : IProductRepository
         return Save();
     }
 
-    public bool DeleteProductFromAccountById(int id)
+    public bool DeleteProductFromAccountById(int accountProductId)
     {
-        AccountProduct? accountProduct = _context.AccountProducts.FirstOrDefault(ap => ap.Id == id);
+        AccountProduct? accountProduct = _context.AccountProducts.FirstOrDefault(ap => ap.Id == accountProductId);
 
         if (accountProduct == null)
         {
@@ -89,19 +89,18 @@ public class ProductRepository : IProductRepository
         return Save();
     }
 
-    public bool UpdateProductExpirationDateFromAccountById(int id, DateTime date)
+    public bool UpdateProductExpirationDateFromAccountById(int accountProductId, DateTime date)
     {
-        AccountProduct? accountProduct = _context.AccountProducts.FirstOrDefault(ap => ap.Id == id);
+        AccountProduct? accountProduct = _context.AccountProducts.FirstOrDefault(ap => ap.Id == accountProductId);
 
-        if (accountProduct != null)
+        if (accountProduct == null)
         {
-            accountProduct.ExpirationDate = date;
-            Save();
-
-            return true;
+            return false;
         }
 
-        return false;
+        accountProduct.ExpirationDate = date;
+        
+        return Save();
     }
 
     private bool Save()
