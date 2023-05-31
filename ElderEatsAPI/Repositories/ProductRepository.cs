@@ -20,16 +20,24 @@ public class ProductRepository : IProductRepository
         return _context.Products.ToList();
     }
 
-    public List<Product> GetActiveProductsFromAccount()
+    public ProductPaginateDto GetActiveProductsFromAccount(int skip, int take)
     {
         var query = _context.AccountProducts
-            .Where(ap => ap.AccountId == Identity.Account.Id && ap.RanOutAt > DateTime.Now)
+            .Where(ap => ap.AccountId == Identity.Account!.Id && ap.RanOutAt > DateTime.Now)
             .OrderBy(ap => ap.ExpirationDate)
-            .Select(ap => ap.Product)
-            .ToList();
-            //TODO: Add paginate 4. Add as method variable.
+            .Select(ap => ap.Product);
 
-            return query;
+        int count = query.Count();
+        List<Product> products = query
+            .Skip(skip)
+            .Take(take)
+            .ToList();
+
+        return new ProductPaginateDto
+        {
+            Products = products,
+            Count = count
+        };
     }
 
     public Product? GetProduct(int id)
@@ -75,8 +83,9 @@ public class ProductRepository : IProductRepository
         {
             return false;
         }
+
         _context.Remove(accountProduct);
-        
+
         return Save();
     }
 
@@ -88,7 +97,7 @@ public class ProductRepository : IProductRepository
         {
             accountProduct.ExpirationDate = date;
             Save();
-            
+
             return true;
         }
 

@@ -33,18 +33,36 @@ public class ProductsController : ControllerBase
 
         return Ok(productsDto);
     }
-    
-    [HttpGet("Accoount/{id}")]
-    public IActionResult GetActiveProductsFromAccount()
+
+    [HttpGet("Account/{id}")]
+    public IActionResult GetActiveProductsFromAccount(int take, int page)
     {
-        List<ProductViewModel> productsDto = _mapper.Map<List<ProductViewModel>>(_productRepository.GetActiveProductsFromAccount());
-    
-        if (!ModelState.IsValid)
+        if (page <= 0)
         {
-            return BadRequest(ModelState);
+            return BadRequest("Page cannot be 0 or less");
         }
 
-        return Ok(productsDto);
+        if (take <= 0)
+        {
+            return BadRequest("Take cannot be 0 or less");
+        }
+
+        ProductPaginateDto productPaginateDto =
+            _productRepository.GetActiveProductsFromAccount(take * (page - 1), take);
+
+        int maxPages = (int)Math.Ceiling(productPaginateDto.Count / (float)take);
+
+        if (page > maxPages)
+        {
+            return BadRequest("Given page is larger than MaxPage");
+        }
+        PaginatedViewModel<ProductViewModel> productPaginatedViewModel = new PaginatedViewModel<ProductViewModel>(
+            _mapper.Map<List<ProductViewModel>>(productPaginateDto.Products),
+            page,
+            maxPages
+        );
+
+        return Ok(productPaginatedViewModel);
     }
 
     [HttpGet("{id}")]
@@ -93,7 +111,7 @@ public class ProductsController : ControllerBase
 
         return Ok(productPaginatedViewModel);
     }
-    
+
     [HttpGet("product/{barcode}")]
     public IActionResult GetProductByBarcode(string barcode)
     {
@@ -161,29 +179,26 @@ public class ProductsController : ControllerBase
     [HttpDelete]
     public IActionResult DeleteProductFromAccountById(int id)
     {
-        if (! _productRepository.DeleteProductFromAccountById(id))
+        if (!_productRepository.DeleteProductFromAccountById(id))
         {
             ModelState.AddModelError("", "Error while deleting product to database");
-            
+
             return StatusCode(500, ModelState);
         }
-    
+
         return NoContent();
-    
     }
-    
+
     [HttpPut]
     public IActionResult UpdateProductExpirationDateFromAccountById(int id, DateTime date)
     {
-        if (! _productRepository.UpdateProductExpirationDateFromAccountById(id, date))
+        if (!_productRepository.UpdateProductExpirationDateFromAccountById(id, date))
         {
             ModelState.AddModelError("", "Error while deleting product to database");
-            
+
             return StatusCode(500, ModelState);
         }
-    
+
         return NoContent();
-    
     }
- 
 }

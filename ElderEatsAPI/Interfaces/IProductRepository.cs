@@ -7,7 +7,7 @@ public interface IProductRepository
 {
     public List<Product> GetProducts();
     
-    public List<Product> GetActiveProductsFromAccount();
+    public ProductPaginateDto GetActiveProductsFromAccount(int skip, int take);
 
     public Product? GetProduct(int id);
 
