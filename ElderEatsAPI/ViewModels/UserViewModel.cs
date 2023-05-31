@@ -1,16 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿namespace ElderEatsAPI.ViewModels;
 
-namespace ElderEatsAPI.Dto;
-
-public class UserDto
+public class UserViewModel
 {
-    public long Id { get; set; }
-    
     public string Name { get; set; }
 
     public string Email { get; set; }
 
     public DateTime? EmailVerifiedAt { get; set; }
+    
+    public string Token { get; set; }
 
     public string? RememberToken { get; set; }
 

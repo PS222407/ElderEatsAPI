@@ -41,7 +41,7 @@ public class UserController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-        
+
         User user = _mapper.Map<User>(userLoginPostDto);
 
         UserValidationDto userValidationDto = _userRepository.Login(user);
