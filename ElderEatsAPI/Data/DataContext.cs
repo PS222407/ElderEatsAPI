@@ -12,12 +12,14 @@ public class DataContext : DbContext
     public DbSet<Product> Products { get; set; } = null!;
 
     public DbSet<Account> Accounts { get; set; } = null!;
-    
+
     public DbSet<User> Users { get; set; } = null!;
 
     public DbSet<AccountProduct> AccountProducts { get; set; }
-    
+
     public DbSet<AccountUser> AccountUsers { get; set; }
+
+    public DbSet<FixedProduct> FixedProducts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -36,6 +38,17 @@ public class DataContext : DbContext
         modelBuilder.Entity<AccountProduct>().ToTable("account_products")
             .HasOne(a => a.Product)
             .WithMany(ap => ap.AccountProducts)
+            .HasForeignKey(p => p.ProductId);
+
+        modelBuilder.Entity<FixedProduct>().ToTable("fixed_products")
+            .HasKey(fp => fp.Id);
+        modelBuilder.Entity<FixedProduct>().ToTable("fixed_products")
+            .HasOne(a => a.Account)
+            .WithMany(fp => fp.FixedProducts)
+            .HasForeignKey(a => a.AccountId);
+        modelBuilder.Entity<FixedProduct>().ToTable("fixed_products")
+            .HasOne(p => p.Product)
+            .WithMany(fp => fp.FixedProducts)
             .HasForeignKey(p => p.ProductId);
 
         modelBuilder.Entity<AccountUser>().ToTable("account_users")

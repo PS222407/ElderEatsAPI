@@ -1,8 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ElderEatsAPI.Models;
 
-public class AccountProduct
+public class FixedProduct
 {
     public long Id { get; set; }
 
@@ -12,17 +12,14 @@ public class AccountProduct
     [Column("product_id")]
     public long ProductId { get; set; }
 
-    [Column("expiration_date")]
-    public DateTime? ExpirationDate { get; set; }
-
-    [Column("ran_out_at")]
-    public DateTime? RanOutAt { get; set; }
-
     [Column("created_at")]
     public DateTime CreatedAt { get; set; }
 
     [Column("updated_at")]
     public DateTime UpdatedAt { get; set; }
+
+    [Column("is_active")]
+    public bool isActive { get; set; }
 
     public Account Account { get; set; }
 

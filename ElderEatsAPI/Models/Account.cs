@@ -28,4 +28,6 @@ public class Account
     public List<AccountProduct> AccountProducts { get; set; }
     
     public List<AccountUser> AccountUsers { get; set; }
+    
+    public List<FixedProduct> FixedProducts { get; set; }
 }
