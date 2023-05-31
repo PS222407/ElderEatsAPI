@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ElderEatsAPI.Models;
 using ElderEatsAPI.Interfaces;
-using ElderEatsAPI.Dto;
 using AutoMapper;
+using ElderEatsAPI.Auth;
 using ElderEatsAPI.Middleware;
+using ElderEatsAPI.Requests;
 using ElderEatsAPI.ViewModels;
 
 namespace ElderEatsAPI.Controllers;
@@ -57,6 +58,7 @@ public class AccountsController : ControllerBase
         return Ok(accountViewModel);
     }
 
+    [AuthFilter]
     [HttpGet("{id:int}/Users")]
     public IActionResult GetAccountUsers(int id)
     {
@@ -75,6 +77,7 @@ public class AccountsController : ControllerBase
         return Ok(accountViewModel);
     }
 
+    [AuthFilter]
     [HttpGet("{id:int}/Users/Connected")]
     public IActionResult GetAccountConnectedUsers(int id)
     {
@@ -93,6 +96,7 @@ public class AccountsController : ControllerBase
         return Ok(accountViewModel);
     }
 
+    [AuthFilter]
     [HttpGet("{id:int}/Users/InProcess")]
     public IActionResult GetAccountInProcessUsers(int id)
     {
@@ -112,7 +116,7 @@ public class AccountsController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult StoreAccount([FromBody] AccountPostDto accountDto)
+    public IActionResult StoreAccount([FromBody] AccountStoreRequest accountDto)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -128,9 +132,12 @@ public class AccountsController : ControllerBase
         return Ok(accountViewModel);
     }
 
-    [HttpPut("{id:int}")]
-    public IActionResult UpdateAccount([FromRoute] int id, [FromBody] AccountPostDto accountDto)
+    [AccountAuthFilter("account")]
+    [HttpPut]
+    public IActionResult UpdateAccount([FromBody] AccountStoreRequest accountDto)
     {
+        int id = (int)Identity.Account!.Id;
+
         if (!_accountRepository.AccountExists(id))
         {
             return NotFound();
@@ -154,8 +161,9 @@ public class AccountsController : ControllerBase
         return NoContent();
     }
 
+    [AuthFilter]
     [HttpPut("{accountId:int}/User/{userId:int}")]
-    public IActionResult UpdateAccountUserConnection([FromRoute] int accountId, [FromRoute] int userId, [FromBody] AccountUserDto accountUserDto)
+    public IActionResult UpdateAccountUserConnection([FromRoute] int accountId, [FromRoute] int userId, [FromBody] AccountUserUpdateRequest accountUserUpdateRequest)
     {
         AccountUser? accountUser = _accountRepository.FindAccountUser(accountId, userId);
         if (accountUser == null)
@@ -168,7 +176,7 @@ public class AccountsController : ControllerBase
             return BadRequest();
         }
 
-        accountUser.Status = (int)accountUserDto.Status;
+        accountUser.Status = (int)accountUserUpdateRequest.Status;
         if (!_accountRepository.UpdateAccountUserConnection(accountUser))
         {
             ModelState.AddModelError("", "Updating account user's connection status went wrong");
@@ -179,6 +187,7 @@ public class AccountsController : ControllerBase
         return NoContent();
     }
 
+    [AuthFilter]
     [HttpDelete("{accountId:int}/User/{userId:int}")]
     public IActionResult DetachAccountUser([FromRoute] int accountId, [FromRoute] int userId)
     {

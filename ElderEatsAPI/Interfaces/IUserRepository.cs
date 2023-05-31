@@ -1,4 +1,4 @@
-﻿using ElderEatsAPI.Dto.Validation;
+﻿using ElderEatsAPI.Dto;
 using ElderEatsAPI.Models;
 
 namespace ElderEatsAPI.Interfaces;

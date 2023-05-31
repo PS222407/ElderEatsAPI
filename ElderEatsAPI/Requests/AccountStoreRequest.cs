@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
 
-namespace ElderEatsAPI.Dto;
+namespace ElderEatsAPI.Requests;
 
 [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-public class AccountPostDto
+public class AccountStoreRequest
 {
     public string? Name { get; set; }
 

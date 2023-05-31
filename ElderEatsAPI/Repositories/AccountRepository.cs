@@ -126,12 +126,12 @@ public class AccountRepository : IAccountRepository
         return _context.Accounts.Any(a => a.Id == id);
     }
 
-    public bool AddProductToAccount(AccountProduct accountProductDto)
+    public bool AddProductToAccount(AccountProduct accountProduct)
     {
-        accountProductDto.UpdatedAt = DateTime.Now;
-        accountProductDto.CreatedAt = DateTime.Now;
+        accountProduct.UpdatedAt = DateTime.Now;
+        accountProduct.CreatedAt = DateTime.Now;
 
-        _context.Add(accountProductDto);
+        _context.Add(accountProduct);
 
         return Save();
     }

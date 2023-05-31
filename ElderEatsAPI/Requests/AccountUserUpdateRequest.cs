@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using ElderEatsAPI.Enums;
 
-namespace ElderEatsAPI.Dto;
+namespace ElderEatsAPI.Requests;
 
-public class AccountUserDto
+public class AccountUserUpdateRequest
 {
     [EnumDataType(typeof(ConnectionStatus))]
     public ConnectionStatus Status { get; set; }

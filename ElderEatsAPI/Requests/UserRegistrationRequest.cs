@@ -1,6 +1,6 @@
-﻿namespace ElderEatsAPI.Dto;
+﻿namespace ElderEatsAPI.Requests;
 
-public class UserRegistrationPostDto
+public class UserRegistrationRequest
 {
     public string Email { get; set; }
     

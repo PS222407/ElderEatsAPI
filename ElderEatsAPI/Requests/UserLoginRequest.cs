@@ -1,8 +1,8 @@
 ﻿using Microsoft.Build.Framework;
 
-namespace ElderEatsAPI.Dto;
+namespace ElderEatsAPI.Requests;
 
-public class UserLoginPostDto
+public class UserLoginRequest
 {
     [Required]
     public string Email { get; set; }

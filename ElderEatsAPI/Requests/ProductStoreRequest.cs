@@ -1,6 +1,6 @@
-﻿namespace ElderEatsAPI.Dto;
+﻿namespace ElderEatsAPI.Requests;
 
-public class ProductPostDto
+public class ProductStoreRequest
 {
     public string Name { get; set; }
 
