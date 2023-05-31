@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ElderEatsAPI.Models;
-using ElderEatsAPI.Data;
 using ElderEatsAPI.Interfaces;
 using AutoMapper;
 using ElderEatsAPI.Dto;
+using ElderEatsAPI.ViewModels;
 
 namespace ElderEatsAPI.Controllers;
 
@@ -11,15 +11,12 @@ namespace ElderEatsAPI.Controllers;
 [ApiController]
 public class ProductsController : ControllerBase
 {
-    private readonly DataContext _context;
-
     private readonly IProductRepository _productRepository;
 
     private readonly IMapper _mapper;
 
-    public ProductsController(DataContext context, IProductRepository productRepository, IMapper mapper)
+    public ProductsController(IProductRepository productRepository, IMapper mapper)
     {
-        _context = context;
         _productRepository = productRepository;
         _mapper = mapper;
     }
@@ -27,7 +24,7 @@ public class ProductsController : ControllerBase
     [HttpGet]
     public IActionResult GetProducts()
     {
-        List<ProductDto> productsDto = _mapper.Map<List<ProductDto>>(_productRepository.GetProducts());
+        List<ProductViewModel> productsDto = _mapper.Map<List<ProductViewModel>>(_productRepository.GetProducts());
 
         if (!ModelState.IsValid)
         {
@@ -40,9 +37,9 @@ public class ProductsController : ControllerBase
     [HttpGet("{id}")]
     public IActionResult GetProduct(int id)
     {
-        ProductDto productDto = _mapper.Map<ProductDto>(_productRepository.GetProduct(id));
+        ProductViewModel productViewModel = _mapper.Map<ProductViewModel>(_productRepository.GetProduct(id));
 
-        if (productDto == null)
+        if (productViewModel == null)
         {
             return NotFound();
         }
@@ -52,7 +49,36 @@ public class ProductsController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        return Ok(productDto);
+        return Ok(productViewModel);
+    }
+
+    [HttpGet("search/{name}")]
+    public IActionResult SearchProductsPaginated(string? name, int take, int page)
+    {
+        if (page <= 0)
+        {
+            return BadRequest("Page cannot be 0 or less");
+        }
+        if (take <= 0)
+        {
+            return BadRequest("Take cannot be 0 or less");
+        }
+
+        var productPaginateDto = _productRepository.SearchProductsByNamePaginated(name, take * (page - 1), take);
+
+        int maxPages = (int)Math.Ceiling(productPaginateDto.Count / (float)take);
+        if (page > maxPages)
+        {
+            return BadRequest("Given page is larger than MaxPage");
+        }
+
+        PaginatedViewModel<ProductViewModel> productPaginatedViewModel = new PaginatedViewModel<ProductViewModel>(
+            _mapper.Map<List<ProductViewModel>>(productPaginateDto.Products),
+            page,
+            maxPages
+        );
+
+        return Ok(productPaginatedViewModel);
     }
 
     // // PUT: api/Products/5

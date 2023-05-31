@@ -1,4 +1,5 @@
 ﻿using ElderEatsAPI.Data;
+using ElderEatsAPI.Dto;
 using ElderEatsAPI.Interfaces;
 using ElderEatsAPI.Models;
 
@@ -21,6 +22,31 @@ public class ProductRepository : IProductRepository
     public Product? GetProduct(int id)
     {
         return _context.Products.FirstOrDefault(p => p.Id == id);
+    }
+
+    public ProductPaginateDto SearchProductsByNamePaginated(string? name, int? skip, int? take)
+    {
+        IQueryable<Product> query = _context.Products.Where(p => p.Name.Contains(name != null ? name.Trim() : ""));
+        int count = query.Count();
+        
+        query = query.OrderByDescending(product => product.Id);
+
+        if (skip != null)
+        {
+            query = query.Skip(skip.Value);
+        }
+        if (take != null)
+        {
+            query = query.Take(take.Value);
+        }
+
+        var list = query.ToList();
+
+        return new ProductPaginateDto
+        {
+            Products = list,
+            Count = count,
+        };
     }
 
     public bool StoreProduct(Product product)

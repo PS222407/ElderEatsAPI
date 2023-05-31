@@ -28,7 +28,7 @@ public class DataContext : DbContext
         modelBuilder.Entity<User>().ToTable("users");
 
         modelBuilder.Entity<AccountProduct>().ToTable("account_products")
-            .HasKey(ap => new { ap.AccountId, ap.ProductId });
+            .HasKey(ap => ap.Id);
         modelBuilder.Entity<AccountProduct>().ToTable("account_products")
             .HasOne(a => a.Account)
             .WithMany(ap => ap.AccountProducts)
@@ -39,7 +39,7 @@ public class DataContext : DbContext
             .HasForeignKey(p => p.ProductId);
 
         modelBuilder.Entity<AccountUser>().ToTable("account_users")
-            .HasKey(au => new { au.AccountId, au.UserId });
+            .HasKey(au => au.Id);
         modelBuilder.Entity<AccountUser>().ToTable("account_users")
             .HasOne(au => au.Account)
             .WithMany(a => a.AccountUsers)
