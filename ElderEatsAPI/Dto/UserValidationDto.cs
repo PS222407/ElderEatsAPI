@@ -1,6 +1,6 @@
 ﻿using ElderEatsAPI.Models;
 
-namespace ElderEatsAPI.Dto.Validation;
+namespace ElderEatsAPI.Dto;
 
 public class UserValidationDto
 {

@@ -1,6 +1,6 @@
-﻿namespace ElderEatsAPI.Dto;
+﻿namespace ElderEatsAPI.ViewModels;
 
-public class UserRegistrationDto
+public class UserRegistrationViewModel
 {
     public string Email { get; set; }
     

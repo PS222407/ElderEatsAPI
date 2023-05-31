@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
 using ElderEatsAPI.Dto;
-using ElderEatsAPI.Dto.Validation;
 using ElderEatsAPI.Interfaces;
 using ElderEatsAPI.Models;
+using ElderEatsAPI.Requests;
+using ElderEatsAPI.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ElderEatsAPI.Controllers;
@@ -20,9 +21,9 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("Register")]
-    public IActionResult Register([FromBody] UserRegistrationPostDto userRegistrationPostDto)
+    public IActionResult Register([FromBody] UserRegistrationRequest userRegistrationRequest)
     {
-        User user = _mapper.Map<User>(userRegistrationPostDto);
+        User user = _mapper.Map<User>(userRegistrationRequest);
 
         UserValidationDto userValidationDto = _userRepository.Register(user);
         if (userValidationDto.Reason != null)
@@ -31,18 +32,18 @@ public class UserController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        return Ok(_mapper.Map<UserRegistrationDto>(userValidationDto.User));
+        return Ok(_mapper.Map<UserRegistrationViewModel>(userValidationDto.User));
     }
 
     [HttpPost("Login")]
-    public IActionResult Login([FromBody] UserLoginPostDto userLoginPostDto)
+    public IActionResult Login([FromBody] UserLoginRequest userLoginRequest)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        User user = _mapper.Map<User>(userLoginPostDto);
+        User user = _mapper.Map<User>(userLoginRequest);
 
         UserValidationDto userValidationDto = _userRepository.Login(user);
         if (userValidationDto.Reason != null)
@@ -51,6 +52,6 @@ public class UserController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        return Ok(_mapper.Map<UserRegistrationDto>(userValidationDto.User));
+        return Ok(_mapper.Map<UserRegistrationViewModel>(userValidationDto.User));
     }
 }

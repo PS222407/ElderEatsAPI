@@ -1,5 +1,5 @@
 ﻿using ElderEatsAPI.Data;
-using ElderEatsAPI.Dto.Validation;
+using ElderEatsAPI.Dto;
 using ElderEatsAPI.Interfaces;
 using ElderEatsAPI.Models;
 

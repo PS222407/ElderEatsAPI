@@ -22,7 +22,8 @@ public class ProductsController : ControllerBase
         _productRepository = productRepository;
         _mapper = mapper;
     }
-
+    
+    [AuthFilter]
     [HttpGet]
     public IActionResult GetProducts()
     {
@@ -36,7 +37,7 @@ public class ProductsController : ControllerBase
         return Ok(productsDto);
     }
 
-    [AccountAuthFilter("employee")]
+    [AccountAuthFilter("account")]
     [HttpGet("Account/{id:int}")]
     public IActionResult GetActiveProductsFromAccount(int take, int page)
     {
@@ -68,6 +69,7 @@ public class ProductsController : ControllerBase
         return Ok(productPaginatedViewModel);
     }
 
+    [AuthFilter]
     [HttpGet("{id:int}")]
     public IActionResult GetProduct(int id)
     {
@@ -86,6 +88,7 @@ public class ProductsController : ControllerBase
         return Ok(productViewModel);
     }
 
+    [AuthFilter]
     [HttpGet("Search/{name}")]
     public IActionResult SearchProductsPaginated(string? name, int take, int page)
     {
@@ -116,6 +119,7 @@ public class ProductsController : ControllerBase
         return Ok(productPaginatedViewModel);
     }
 
+    [AuthFilter]
     [HttpGet("Product/{barcode}")]
     public IActionResult GetProductByBarcode(string barcode)
     {
@@ -134,10 +138,11 @@ public class ProductsController : ControllerBase
         return Ok(productViewModel);
     }
 
+    [AuthFilter]
     [HttpPost]
-    public IActionResult StoreProduct(ProductPostDto productPostDto)
+    public IActionResult StoreProduct(ProductStoreRequest productStoreRequest)
     {
-        Product product = _mapper.Map<Product>(productPostDto);
+        Product product = _mapper.Map<Product>(productStoreRequest);
 
         if (!_productRepository.StoreProduct(product))
         {
@@ -149,6 +154,7 @@ public class ProductsController : ControllerBase
         return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
     }
 
+    [AuthFilter]
     [HttpPut("Account/{accountProductId:int}/ExpirationDate")]
     public IActionResult UpdateProductExpirationDateFromAccountById([FromRoute] int accountProductId, [FromBody] AccountProductUpdateRequest accountProductUpdateRequest)
     {
@@ -159,8 +165,8 @@ public class ProductsController : ControllerBase
 
         return NoContent();
     }
-
-
+    
+    [AuthFilter]
     [HttpDelete("Account/{accountProductId:int}")]
     public IActionResult DeleteProductFromAccountById(int accountProductId)
     {
