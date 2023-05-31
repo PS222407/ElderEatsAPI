@@ -17,6 +17,8 @@ public interface IAccountRepository
     public Account? GetAccountWithProcessingUsers(int id);
 
     public List<Product> GetAccountProducts(int id);
+    
+    public List<Product> GetAccountActiveProducts(int id);
 
     public Account? StoreAccount(Account account);
 

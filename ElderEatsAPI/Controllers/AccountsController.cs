@@ -4,6 +4,7 @@ using ElderEatsAPI.Interfaces;
 using ElderEatsAPI.Dto;
 using AutoMapper;
 using ElderEatsAPI.Middleware;
+using ElderEatsAPI.ViewModels;
 
 namespace ElderEatsAPI.Controllers;
 
@@ -86,6 +87,19 @@ public class AccountsController : ControllerBase
     //
     //     return Ok(productsDto);
     // }
+    
+    [HttpGet("account/{id:int}/Products/Active")]
+    public IActionResult GetAccountActiveProducts(int id)
+    {
+        List<ProductViewModel> productsDto = _mapper.Map<List<ProductViewModel>>(_accountRepository.GetAccountActiveProducts(id));
+    
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+    
+        return Ok(productsDto);
+    }
 
     [AccountAuthFilter("employee")]
     [HttpGet("{id:int}/Users")]
