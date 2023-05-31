@@ -1,4 +1,5 @@
-﻿using ElderEatsAPI.Models;
+﻿using ElderEatsAPI.Dto;
+using ElderEatsAPI.Models;
 
 namespace ElderEatsAPI.Interfaces;
 
@@ -7,6 +8,8 @@ public interface IProductRepository
     public List<Product> GetProducts();
 
     public Product? GetProduct(int id);
+
+    public ProductPaginateDto SearchProductsByNamePaginated(string? name, int? skip, int? take);
 
     public bool StoreProduct(Product product);
 }

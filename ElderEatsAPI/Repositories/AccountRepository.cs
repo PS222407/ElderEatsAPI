@@ -48,7 +48,7 @@ public class AccountRepository : IAccountRepository
             .Include(a => a.AccountUsers
                 .Where(au => au.Status == (int)ConnectionStatus.Connected))
             .ThenInclude(au => au.User)
-            .FirstOrDefault();
+            .FirstOrDefault();      
 
         return account;
     }
