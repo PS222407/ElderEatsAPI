@@ -4,6 +4,7 @@ using ElderEatsAPI.Interfaces;
 using ElderEatsAPI.Dto;
 using AutoMapper;
 using ElderEatsAPI.Middleware;
+using ElderEatsAPI.ViewModels;
 
 namespace ElderEatsAPI.Controllers;
 
@@ -90,7 +91,7 @@ public class AccountsController : ControllerBase
     [HttpGet("account/{id:int}/Products/Active")]
     public IActionResult GetAccountActiveProducts(int id)
     {
-        List<ProductDto> productsDto = _mapper.Map<List<ProductDto>>(_accountRepository.GetAccountActiveProducts(id));
+        List<ProductViewModel> productsDto = _mapper.Map<List<ProductViewModel>>(_accountRepository.GetAccountActiveProducts(id));
     
         if (!ModelState.IsValid)
         {

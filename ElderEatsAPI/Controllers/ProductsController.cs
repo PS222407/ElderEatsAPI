@@ -37,7 +37,7 @@ public class ProductsController : ControllerBase
     [HttpGet("Accoount/{id}")]
     public IActionResult GetActiveProductsFromAccount()
     {
-        List<ProductDto> productsDto = _mapper.Map<List<ProductDto>>(_productRepository.GetActiveProductsFromAccount());
+        List<ProductViewModel> productsDto = _mapper.Map<List<ProductViewModel>>(_productRepository.GetActiveProductsFromAccount());
     
         if (!ModelState.IsValid)
         {
@@ -97,7 +97,7 @@ public class ProductsController : ControllerBase
     [HttpGet("product/{barcode}")]
     public IActionResult GetProductByBarcode(string barcode)
     {
-        ProductDto productDto = _mapper.Map<ProductDto>(_productRepository.GetProductByBarcode(barcode));
+        ProductViewModel productDto = _mapper.Map<ProductViewModel>(_productRepository.GetProductByBarcode(barcode));
 
         if (productDto == null)
         {
