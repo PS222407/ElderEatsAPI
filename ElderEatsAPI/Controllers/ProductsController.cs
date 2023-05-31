@@ -4,6 +4,7 @@ using ElderEatsAPI.Interfaces;
 using AutoMapper;
 using ElderEatsAPI.Dto;
 using ElderEatsAPI.Middleware;
+using ElderEatsAPI.Requests;
 using ElderEatsAPI.ViewModels;
 
 namespace ElderEatsAPI.Controllers;
