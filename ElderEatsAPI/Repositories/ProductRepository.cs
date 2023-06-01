@@ -52,7 +52,12 @@ public class ProductRepository : IProductRepository
         // Working without the search
         var query = _context.AccountProducts
             .Where(ap => ap.AccountId == accountId && ap.RanOutAt > DateTime.Now)
-            .GroupBy(ap => new { ap.ProductId, ap.ExpirationDate })
+            .Join(_context.Products,
+                ap => ap.ProductId,
+                p => p.Id,
+                (ap, p) => new { AccountProduct = ap, Product = p })
+            .Where(joined => joined.Product.Name.Contains(name))
+            .GroupBy(joined => new { joined.AccountProduct.ProductId, joined.AccountProduct.ExpirationDate })
             .OrderBy(g => g.Key.ExpirationDate == null)
             .ThenBy(g => g.Key.ExpirationDate)
             .Select(g => new { g.FirstOrDefault().Product, Count = g.Count() });
