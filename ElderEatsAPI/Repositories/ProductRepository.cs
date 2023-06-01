@@ -20,7 +20,7 @@ public class ProductRepository : IProductRepository
         return _context.Products.ToList();
     }
 
-    public ProductPaginateDto GetActiveProductsFromAccount(int skip, int take)
+    public PaginateDto<Product> GetActiveProductsFromAccount(int skip, int take)
     {
         var query = _context.AccountProducts
             .Where(ap => ap.AccountId == Identity.Account!.Id && ap.RanOutAt > DateTime.Now)
@@ -33,9 +33,51 @@ public class ProductRepository : IProductRepository
             .Take(take)
             .ToList();
 
-        return new ProductPaginateDto
+        return new PaginateDto<Product>
         {
-            Products = products,
+            Items = products,
+            Count = count
+        };
+    }
+
+    // products from account
+    // with count of products
+    // ordered by expiration date
+    // paginate 4 with search
+    public PaginateDto<ProductGroupedDto> GetProductsFromAccountPaginated(string name, int skip, int take)
+    {
+        // int accountId = Identity.Account!.Id;
+        int accountId = 1;
+        
+        // Working without the search
+        var query = _context.AccountProducts
+            .Where(ap => ap.AccountId == accountId && ap.RanOutAt > DateTime.Now)
+            .GroupBy(ap => new { ap.ProductId, ap.ExpirationDate })
+            .OrderBy(g => g.Key.ExpirationDate == null)
+            .ThenBy(g => g.Key.ExpirationDate)
+            .Select(g => new { g.FirstOrDefault().Product, Count = g.Count() });
+
+        int count = query.Count();
+        var list = query
+            .Skip(skip)
+            .Take(take)
+            .ToList();
+
+
+        var productGroupedDtos = new List<ProductGroupedDto>();
+        foreach (var row in list)
+        {
+            ProductGroupedDto productGroupedDto = new ProductGroupedDto
+            {
+                Count = row.Count,
+                Product = row.Product,
+            };
+            productGroupedDtos.Add(productGroupedDto);
+        }
+
+        return new PaginateDto<ProductGroupedDto>
+        {
+            Items = productGroupedDtos,
             Count = count
         };
     }
@@ -50,7 +92,7 @@ public class ProductRepository : IProductRepository
         return _context.Products.FirstOrDefault(p => p.Barcode == barcode);
     }
 
-    public ProductPaginateDto SearchProductsByNamePaginated(string? name, int skip, int take)
+    public PaginateDto<Product> SearchProductsByNamePaginated(string? name, int skip, int take)
     {
         IQueryable<Product> query = _context.Products.Where(p => p.Name.Contains(name != null ? name.Trim() : ""));
         int count = query.Count();
@@ -59,9 +101,9 @@ public class ProductRepository : IProductRepository
             .Take(take)
             .ToList();
 
-        return new ProductPaginateDto
+        return new PaginateDto<Product>
         {
-            Products = list,
+            Items = list,
             Count = count,
         };
     }
@@ -99,7 +141,7 @@ public class ProductRepository : IProductRepository
         }
 
         accountProduct.ExpirationDate = date;
-        
+
         return Save();
     }
 
