@@ -9,7 +9,7 @@ public interface IProductRepository
 
     public PaginateDto<Product> GetActiveProductsFromAccount(int skip, int take);
 
-    public PaginateDto<ProductGroupedDto> GetProductsFromAccountPaginated(string name, int skip, int take);
+    public PaginateDto<ProductGroupedDto> GetProductsFromAccountPaginated(string? name, int skip, int take);
 
     public Product? GetProduct(int id);
 

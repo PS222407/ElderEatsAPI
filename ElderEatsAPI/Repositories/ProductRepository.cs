@@ -40,23 +40,18 @@ public class ProductRepository : IProductRepository
         };
     }
 
-    // products from account
-    // with count of products
-    // ordered by expiration date
-    // paginate 4 with search
-    public PaginateDto<ProductGroupedDto> GetProductsFromAccountPaginated(string name, int skip, int take)
+    public PaginateDto<ProductGroupedDto> GetProductsFromAccountPaginated(string? name, int skip, int take)
     {
         // int accountId = Identity.Account!.Id;
         int accountId = 1;
-        
-        // Working without the search
+
         var query = _context.AccountProducts
             .Where(ap => ap.AccountId == accountId && ap.RanOutAt > DateTime.Now)
             .Join(_context.Products,
                 ap => ap.ProductId,
                 p => p.Id,
                 (ap, p) => new { AccountProduct = ap, Product = p })
-            .Where(joined => joined.Product.Name.Contains(name))
+            .Where(joined => joined.Product.Name.Contains(name != null ? name.Trim() : ""))
             .GroupBy(joined => new { joined.AccountProduct.ProductId, joined.AccountProduct.ExpirationDate })
             .OrderBy(g => g.Key.ExpirationDate == null)
             .ThenBy(g => g.Key.ExpirationDate)
@@ -67,7 +62,6 @@ public class ProductRepository : IProductRepository
             .Skip(skip)
             .Take(take)
             .ToList();
-
 
         var productGroupedDtos = new List<ProductGroupedDto>();
         foreach (var row in list)
