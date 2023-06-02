@@ -2,9 +2,9 @@
 
 namespace ElderEatsAPI.Dto;
 
-public class ProductPaginateDto
+public class PaginateDto<T>
 {
-    public List<Product> Products { get; set; }
+    public List<T> Items { get; set; }
     
     public int Count { get; set; }
 }

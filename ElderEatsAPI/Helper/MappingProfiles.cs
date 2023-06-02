@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ElderEatsAPI.Dto;
 using ElderEatsAPI.Models;
 using ElderEatsAPI.Requests;
 using ElderEatsAPI.ViewModels;
@@ -14,6 +15,7 @@ public class MappingProfiles : Profile
         CreateMap<AccountProduct, AccountProductViewModel>();
         CreateMap<Product, ProductViewModel>();
         CreateMap<User, UserViewModel>();
+        CreateMap<ProductGroupedDto, ProductGroupedViewModel>();
         
         CreateMap<AccountStoreRequest, Account>();
         CreateMap<UserRegistrationRequest, User>();

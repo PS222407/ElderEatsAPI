@@ -37,9 +37,42 @@ public class ProductsController : ControllerBase
         return Ok(productsDto);
     }
 
-    [AccountAuthFilter("account")]
-    [HttpGet("Account/{id:int}")]
-    public IActionResult GetActiveProductsFromAccount(int take, int page)
+    // [AccountAuthFilter("account")]
+    // [HttpGet("Account")]
+    // public IActionResult GetActiveProductsFromAccount(int take, int page)
+    // {
+    //     if (page <= 0)
+    //     {
+    //         return BadRequest("Page cannot be 0 or less");
+    //     }
+    //
+    //     if (take <= 0)
+    //     {
+    //         return BadRequest("Take cannot be 0 or less");
+    //     }
+    //
+    //     PaginateDto<Product> productPaginateDto = _productRepository.GetActiveProductsFromAccount(take * (page - 1), take);
+    //
+    //     int maxPages = (int)Math.Ceiling(productPaginateDto.Count / (float)take);
+    //
+    //     if (page > maxPages)
+    //     {
+    //         return BadRequest("Given page is larger than MaxPage");
+    //     }
+    //     PaginatedViewModel<ProductViewModel> productPaginatedViewModel = new PaginatedViewModel<ProductViewModel>(
+    //         _mapper.Map<List<ProductViewModel>>(productPaginateDto.Items),
+    //         page,
+    //         maxPages,
+    //         take,
+    //         productPaginateDto.Count
+    //     );
+    //
+    //     return Ok(productPaginatedViewModel);
+    // }
+    
+    // products from account with count of products ordered by expiration date paginate 4 with search
+    [HttpGet("/abc/def/ghi/{name}", Name = "SearchProductsFromAccountPaginated")]
+    public IActionResult SearchProductsFromAccountPaginated([FromRoute] string? name, int take, int page)
     {
         if (page <= 0)
         {
@@ -50,23 +83,38 @@ public class ProductsController : ControllerBase
         {
             return BadRequest("Take cannot be 0 or less");
         }
+        
+        PaginateDto<ProductGroupedDto> paginateDto = _productRepository.GetProductsFromAccountPaginated(name, take * (page - 1), take);
 
-        ProductPaginateDto productPaginateDto =
-            _productRepository.GetActiveProductsFromAccount(take * (page - 1), take);
-
-        int maxPages = (int)Math.Ceiling(productPaginateDto.Count / (float)take);
-
-        if (page > maxPages)
+        PaginateDto<ProductGroupedViewModel> paginateDtoViewModel = new PaginateDto<ProductGroupedViewModel>();
+        List<ProductGroupedViewModel> productGroupedViewModels = new List<ProductGroupedViewModel>();
+        foreach (ProductGroupedDto item in paginateDto.Items)
+        {
+            ProductGroupedViewModel productGroupedViewModel = new ProductGroupedViewModel
+            {
+                Product = _mapper.Map<ProductViewModel>(item.Product),
+                Count = item.Count,
+            };
+            productGroupedViewModels.Add(productGroupedViewModel);
+        }
+        paginateDtoViewModel.Items = productGroupedViewModels;
+        paginateDtoViewModel.Count = paginateDto.Count;
+        
+        PaginatedViewModel<ProductGroupedViewModel> paginatedViewModel = new PaginatedViewModel<ProductGroupedViewModel>(
+            paginateDtoViewModel,
+            page,
+            take,
+            name,
+            HttpContext,
+            Url
+        );
+        
+        if (page > paginatedViewModel.Paginate.LastPage)
         {
             return BadRequest("Given page is larger than MaxPage");
         }
-        PaginatedViewModel<ProductViewModel> productPaginatedViewModel = new PaginatedViewModel<ProductViewModel>(
-            _mapper.Map<List<ProductViewModel>>(productPaginateDto.Products),
-            page,
-            maxPages
-        );
 
-        return Ok(productPaginatedViewModel);
+        return Ok(paginatedViewModel);
     }
 
     [AuthFilter]
@@ -88,36 +136,38 @@ public class ProductsController : ControllerBase
         return Ok(productViewModel);
     }
 
-    [AuthFilter]
-    [HttpGet("Search/{name}")]
-    public IActionResult SearchProductsPaginated(string? name, int take, int page)
-    {
-        if (page <= 0)
-        {
-            return BadRequest("Page cannot be 0 or less");
-        }
-
-        if (take <= 0)
-        {
-            return BadRequest("Take cannot be 0 or less");
-        }
-
-        ProductPaginateDto productPaginateDto = _productRepository.SearchProductsByNamePaginated(name, take * (page - 1), take);
-
-        int maxPages = (int)Math.Ceiling(productPaginateDto.Count / (float)take);
-        if (page > maxPages)
-        {
-            return BadRequest("Given page is larger than MaxPage");
-        }
-
-        PaginatedViewModel<ProductViewModel> productPaginatedViewModel = new PaginatedViewModel<ProductViewModel>(
-            _mapper.Map<List<ProductViewModel>>(productPaginateDto.Products),
-            page,
-            maxPages
-        );
-
-        return Ok(productPaginatedViewModel);
-    }
+    // [AuthFilter]
+    // [HttpGet("Search/{name}")]
+    // public IActionResult SearchProductsPaginated(string? name, int take, int page)
+    // {
+    //     if (page <= 0)
+    //     {
+    //         return BadRequest("Page cannot be 0 or less");
+    //     }
+    //
+    //     if (take <= 0)
+    //     {
+    //         return BadRequest("Take cannot be 0 or less");
+    //     }
+    //
+    //     PaginateDto<Product> productPaginateDto = _productRepository.SearchProductsByNamePaginated(name, take * (page - 1), take);
+    //
+    //     int maxPages = (int)Math.Ceiling(productPaginateDto.Count / (float)take);
+    //     if (page > maxPages)
+    //     {
+    //         return BadRequest("Given page is larger than MaxPage");
+    //     }
+    //
+    //     PaginatedViewModel<ProductViewModel> productPaginatedViewModel = new PaginatedViewModel<ProductViewModel>(
+    //         _mapper.Map<List<ProductViewModel>>(productPaginateDto.Items),
+    //         page,
+    //         maxPages,
+    //         take,
+    //         productPaginateDto.Count
+    //     );
+    //
+    //     return Ok(productPaginatedViewModel);
+    // }
 
     [AuthFilter]
     [HttpGet("Product/{barcode}")]
