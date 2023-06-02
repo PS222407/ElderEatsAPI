@@ -86,8 +86,22 @@ public class ProductsController : ControllerBase
         
         PaginateDto<ProductGroupedDto> paginateDto = _productRepository.GetProductsFromAccountPaginated(name, take * (page - 1), take);
 
-        var productGroupedDto = new PaginatedViewModel<ProductGroupedDto>(
-            paginateDto,
+        PaginateDto<ProductGroupedViewModel> paginateDtoViewModel = new PaginateDto<ProductGroupedViewModel>();
+        List<ProductGroupedViewModel> productGroupedViewModels = new List<ProductGroupedViewModel>();
+        foreach (ProductGroupedDto item in paginateDto.Items)
+        {
+            ProductGroupedViewModel productGroupedViewModel = new ProductGroupedViewModel
+            {
+                Product = _mapper.Map<ProductViewModel>(item.Product),
+                Count = item.Count,
+            };
+            productGroupedViewModels.Add(productGroupedViewModel);
+        }
+        paginateDtoViewModel.Items = productGroupedViewModels;
+        paginateDtoViewModel.Count = paginateDto.Count;
+        
+        PaginatedViewModel<ProductGroupedViewModel> paginatedViewModel = new PaginatedViewModel<ProductGroupedViewModel>(
+            paginateDtoViewModel,
             page,
             take,
             name,
@@ -95,12 +109,12 @@ public class ProductsController : ControllerBase
             Url
         );
         
-        if (page > productGroupedDto.Paginate.LastPage)
+        if (page > paginatedViewModel.Paginate.LastPage)
         {
             return BadRequest("Given page is larger than MaxPage");
         }
 
-        return Ok(productGroupedDto);
+        return Ok(paginatedViewModel);
     }
 
     [AuthFilter]
