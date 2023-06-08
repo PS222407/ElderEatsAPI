@@ -42,8 +42,7 @@ public class ProductRepository : IProductRepository
 
     public PaginateDto<ProductGroupedDto> GetProductsFromAccountPaginated(string? name, int skip, int take)
     {
-        // int accountId = Identity.Account!.Id;
-        int accountId = 1;
+        long accountId = Identity.Account!.Id;
 
         var query = _context.AccountProducts
             .Where(ap => ap.AccountId == accountId && ap.RanOutAt > DateTime.Now)
