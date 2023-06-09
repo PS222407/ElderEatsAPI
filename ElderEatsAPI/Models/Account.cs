@@ -23,7 +23,7 @@ public class Account
     public DateTime? CreatedAt { get; set; }
 
     [Column("updated_at")]
-    public DateTime UpdatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 
     public List<AccountProduct> AccountProducts { get; set; }
     

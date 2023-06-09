@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
 
-namespace ElderEatsAPI.Dto;
+namespace ElderEatsAPI.ViewModels;
 
 [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-public class ProductDto
+public class ProductViewModel
 {
     public long Id { get; set; }
 

@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ElderEatsAPI.Models;
-using ElderEatsAPI.Data;
 using ElderEatsAPI.Interfaces;
 using AutoMapper;
 using ElderEatsAPI.Dto;
+using ElderEatsAPI.ViewModels;
 
 namespace ElderEatsAPI.Controllers;
 
@@ -11,15 +11,12 @@ namespace ElderEatsAPI.Controllers;
 [ApiController]
 public class ProductsController : ControllerBase
 {
-    private readonly DataContext _context;
-
     private readonly IProductRepository _productRepository;
 
     private readonly IMapper _mapper;
 
-    public ProductsController(DataContext context, IProductRepository productRepository, IMapper mapper)
+    public ProductsController(IProductRepository productRepository, IMapper mapper)
     {
-        _context = context;
         _productRepository = productRepository;
         _mapper = mapper;
     }
@@ -27,8 +24,21 @@ public class ProductsController : ControllerBase
     [HttpGet]
     public IActionResult GetProducts()
     {
-        List<ProductDto> productsDto = _mapper.Map<List<ProductDto>>(_productRepository.GetProducts());
+        List<ProductViewModel> productsDto = _mapper.Map<List<ProductViewModel>>(_productRepository.GetProducts());
 
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(productsDto);
+    }
+    
+    [HttpGet("Accoount/{id}")]
+    public IActionResult GetActiveProductsFromAccount()
+    {
+        List<ProductViewModel> productsDto = _mapper.Map<List<ProductViewModel>>(_productRepository.GetActiveProductsFromAccount());
+    
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
@@ -40,7 +50,54 @@ public class ProductsController : ControllerBase
     [HttpGet("{id}")]
     public IActionResult GetProduct(int id)
     {
-        ProductDto productDto = _mapper.Map<ProductDto>(_productRepository.GetProduct(id));
+        ProductViewModel productViewModel = _mapper.Map<ProductViewModel>(_productRepository.GetProduct(id));
+
+        if (productViewModel == null)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(productViewModel);
+    }
+
+    [HttpGet("search/{name}")]
+    public IActionResult SearchProductsPaginated(string? name, int take, int page)
+    {
+        if (page <= 0)
+        {
+            return BadRequest("Page cannot be 0 or less");
+        }
+        if (take <= 0)
+        {
+            return BadRequest("Take cannot be 0 or less");
+        }
+
+        var productPaginateDto = _productRepository.SearchProductsByNamePaginated(name, take * (page - 1), take);
+
+        int maxPages = (int)Math.Ceiling(productPaginateDto.Count / (float)take);
+        if (page > maxPages)
+        {
+            return BadRequest("Given page is larger than MaxPage");
+        }
+
+        PaginatedViewModel<ProductViewModel> productPaginatedViewModel = new PaginatedViewModel<ProductViewModel>(
+            _mapper.Map<List<ProductViewModel>>(productPaginateDto.Products),
+            page,
+            maxPages
+        );
+
+        return Ok(productPaginatedViewModel);
+    }
+    
+    [HttpGet("product/{barcode}")]
+    public IActionResult GetProductByBarcode(string barcode)
+    {
+        ProductViewModel productDto = _mapper.Map<ProductViewModel>(_productRepository.GetProductByBarcode(barcode));
 
         if (productDto == null)
         {
@@ -101,24 +158,32 @@ public class ProductsController : ControllerBase
         return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
     }
 
-    // // DELETE: api/Products/5
-    // [HttpDelete("{id}")]
-    // public async Task<IActionResult> DeleteProduct(long id)
-    // {
-    //     var product = await _context.Products.FindAsync(id);
-    //     if (product == null)
-    //     {
-    //         return NotFound();
-    //     }
-    //
-    //     _context.Products.Remove(product);
-    //     await _context.SaveChangesAsync();
-    //
-    //     return NoContent();
-    // }
-    //
-    // private bool ProductExists(long id)
-    // {
-    //     return (_context.Products?.Any(e => e.Id == id)).GetValueOrDefault();
-    // }
+    [HttpDelete]
+    public IActionResult DeleteProductFromAccountById(int id)
+    {
+        if (! _productRepository.DeleteProductFromAccountById(id))
+        {
+            ModelState.AddModelError("", "Error while deleting product to database");
+            
+            return StatusCode(500, ModelState);
+        }
+    
+        return NoContent();
+    
+    }
+    
+    [HttpPut]
+    public IActionResult UpdateProductExpirationDateFromAccountById(int id, DateTime date)
+    {
+        if (! _productRepository.UpdateProductExpirationDateFromAccountById(id, date))
+        {
+            ModelState.AddModelError("", "Error while deleting product to database");
+            
+            return StatusCode(500, ModelState);
+        }
+    
+        return NoContent();
+    
+    }
+ 
 }

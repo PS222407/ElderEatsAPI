@@ -1,4 +1,6 @@
-﻿using ElderEatsAPI.Data;
+using ElderEatsAPI.Auth;
+using ElderEatsAPI.Data;
+using ElderEatsAPI.Dto;
 using ElderEatsAPI.Interfaces;
 using ElderEatsAPI.Models;
 
@@ -18,9 +20,49 @@ public class ProductRepository : IProductRepository
         return _context.Products.ToList();
     }
 
+    public List<Product> GetActiveProductsFromAccount()
+    {
+        return _context.AccountProducts
+            .Where(ap => ap.AccountId == Identity.Account.Id && ap.RanOutAt > DateTime.Now)
+            .OrderBy(ap => ap.ExpirationDate)
+            .Select(ap => ap.Product)
+            .ToList();
+            //TODO: Add paginate 4. Add as method variable.
+    }
+
     public Product? GetProduct(int id)
     {
         return _context.Products.FirstOrDefault(p => p.Id == id);
+    }
+
+    public Product? GetProductByBarcode(string barcode)
+    {
+        return _context.Products.FirstOrDefault(p => p.Barcode == barcode);
+    }
+
+    public ProductPaginateDto SearchProductsByNamePaginated(string? name, int? skip, int? take)
+    {
+        IQueryable<Product> query = _context.Products.Where(p => p.Name.Contains(name != null ? name.Trim() : ""));
+        int count = query.Count();
+        
+        query = query.OrderByDescending(product => product.Id);
+
+        if (skip != null)
+        {
+            query = query.Skip(skip.Value);
+        }
+        if (take != null)
+        {
+            query = query.Take(take.Value);
+        }
+
+        var list = query.ToList();
+
+        return new ProductPaginateDto
+        {
+            Products = list,
+            Count = count,
+        };
     }
 
     public bool StoreProduct(Product product)
@@ -30,6 +72,34 @@ public class ProductRepository : IProductRepository
         _context.Add(product);
 
         return Save();
+    }
+
+    public bool DeleteProductFromAccountById(int id)
+    {
+        AccountProduct? accountProduct = _context.AccountProducts.FirstOrDefault(ap => ap.Id == id);
+
+        if (accountProduct == null)
+        {
+            return false;
+        }
+        _context.Remove(accountProduct);
+        
+        return Save();
+    }
+
+    public bool UpdateProductExpirationDateFromAccountById(int id, DateTime date)
+    {
+        AccountProduct? accountProduct = _context.AccountProducts.FirstOrDefault(ap => ap.Id == id);
+
+        if (accountProduct != null)
+        {
+            accountProduct.ExpirationDate = date;
+            Save();
+            
+            return true;
+        }
+
+        return false;
     }
 
     private bool Save()

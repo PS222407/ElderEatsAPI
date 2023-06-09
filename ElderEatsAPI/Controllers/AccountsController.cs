@@ -4,6 +4,8 @@ using ElderEatsAPI.Interfaces;
 using ElderEatsAPI.Dto;
 using AutoMapper;
 using Microsoft.CodeAnalysis;
+using ElderEatsAPI.Middleware;
+using ElderEatsAPI.ViewModels;
 
 namespace ElderEatsAPI.Controllers;
 
@@ -38,10 +40,28 @@ public class AccountsController : ControllerBase
     //     return Ok(accountDto);
     // }
 
-    [HttpGet("token/{token}")]
+    [HttpGet("Token/{token}")]
     public IActionResult GetAccountByToken(string token)
     {
         AccountDto? accountDto = _mapper.Map<AccountDto>(_accountRepository.GetAccountByToken(token));
+
+        if (accountDto == null)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(accountDto);
+    }
+
+    [HttpGet("TemporaryToken/{temporaryToken}")]
+    public IActionResult GetAccountByTemporaryToken(string temporaryToken)
+    {
+        AccountDto? accountDto = _mapper.Map<AccountDto>(_accountRepository.GetAccountByTemporaryToken(temporaryToken));
 
         if (accountDto == null)
         {
@@ -69,7 +89,21 @@ public class AccountsController : ControllerBase
     //     return Ok(productsDto);
     // }
 
-    [HttpGet("{id:int}/users")]
+    [HttpGet("account/{id:int}/Products/Active")]
+    public IActionResult GetAccountActiveProducts(int id)
+    {
+        List<ProductViewModel> productsDto = _mapper.Map<List<ProductViewModel>>(_accountRepository.GetAccountActiveProducts(id));
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(productsDto);
+    }
+
+    [AccountAuthFilter("employee")]
+    [HttpGet("{id:int}/Users")]
     public IActionResult GetAccountUsers(int id)
     {
         Account? account = _accountRepository.GetAccountWithUsers(id);
@@ -78,6 +112,43 @@ public class AccountsController : ControllerBase
         {
             return NotFound();
         }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(account);
+    }
+
+    [HttpGet("{id:int}/Users/Connected")]
+    public IActionResult GetAccountConnectedUsers(int id)
+    {
+        Account? account = _accountRepository.GetAccountWithConnectedUsers(id);
+
+        if (account == null)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(account);
+    }
+
+    [HttpGet("{id:int}/Users/InProcess")]
+    public IActionResult GetAccountInProcessUsers(int id)
+    {
+        Account? account = _accountRepository.GetAccountWithProcessingUsers(id);
+
+        if (account == null)
+        {
+            return NotFound();
+        }
+
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
@@ -96,7 +167,7 @@ public class AccountsController : ControllerBase
         if (account == null)
         {
             ModelState.AddModelError("", "Storing account went wrong");
-        
+
             return StatusCode(500, ModelState);
         }
 
@@ -125,7 +196,7 @@ public class AccountsController : ControllerBase
         return NoContent();
     }
 
-    [HttpPut("{accountId:int}/user/{userId:int}")]
+    [HttpPut("{accountId:int}/User/{userId:int}")]
     public IActionResult UpdateAccountUserConnection([FromRoute] int accountId, [FromRoute] int userId, [FromBody] AccountUserDto accountUserDto)
     {
         AccountUser? accountUser = _accountRepository.FindAccountUser(accountId, userId);
@@ -139,6 +210,26 @@ public class AccountsController : ControllerBase
         if (!_accountRepository.UpdateAccountUserConnection(accountUser))
         {
             ModelState.AddModelError("", "Updating account user's connection status went wrong");
+
+            return StatusCode(500, ModelState);
+        }
+
+        return NoContent();
+    }
+
+    [HttpDelete("{accountId}/User/{userId}")]
+    public IActionResult DetachAccountUser([FromRoute] int accountId, [FromRoute] int userId)
+    {
+        AccountUser? accountUser = _accountRepository.FindAccountUser(accountId, userId);
+
+        if (accountUser == null)
+        {
+            return NotFound();
+        }
+
+        if (!_accountRepository.DetachAccountUser(accountUser))
+        {
+            ModelState.AddModelError("", "Detaching user went wrong");
 
             return StatusCode(500, ModelState);
         }
@@ -171,7 +262,6 @@ public class AccountsController : ControllerBase
     [HttpPut("products/{connectionID:int}/ranout")]
     public IActionResult AccountProductRanout([FromRoute] int connectionID)
     {
-
         if (!ModelState.IsValid)
             return BadRequest();
 
@@ -198,12 +288,8 @@ public class AccountsController : ControllerBase
 
             return StatusCode(500, ModelState);
         }
-        else
-        {
-            _accountRepository.StoreFixedProduct(accountId, productid);
-        }
 
-
+        _accountRepository.StoreFixedProduct(accountId, productid);
 
         return NoContent();
     }

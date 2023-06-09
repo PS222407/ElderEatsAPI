@@ -12,11 +12,11 @@ public class DataContext : DbContext
     public DbSet<Product> Products { get; set; } = null!;
 
     public DbSet<Account> Accounts { get; set; } = null!;
-    
+
     public DbSet<User> Users { get; set; } = null!;
 
     public DbSet<AccountProduct> AccountProducts { get; set; }
-    
+
     public DbSet<AccountUser> AccountUsers { get; set; }
 
     public DbSet<FixedProduct> FixedProducts { get; set; }
@@ -41,7 +41,7 @@ public class DataContext : DbContext
             .HasForeignKey(p => p.ProductId);
 
         modelBuilder.Entity<FixedProduct>().ToTable("fixed_products")
-    .HasKey(fp => fp.Id);
+            .HasKey(fp => fp.Id);
         modelBuilder.Entity<FixedProduct>().ToTable("fixed_products")
             .HasOne(a => a.Account)
             .WithMany(fp => fp.FixedProducts)
