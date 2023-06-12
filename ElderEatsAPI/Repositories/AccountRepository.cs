@@ -1,4 +1,5 @@
 ﻿using ElderEatsAPI.Data;
+using ElderEatsAPI.Dto;
 using ElderEatsAPI.Enums;
 using ElderEatsAPI.Dto;
 using ElderEatsAPI.Interfaces;

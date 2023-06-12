@@ -211,6 +211,23 @@ public class ProductsController : ControllerBase
 
         return Ok(productDto);
     }
+    [HttpGet("product/connection/{connectionID}")]
+    public IActionResult GetProductByConnectionID(int connectionID)
+    {
+        ProductViewModel productDto = _mapper.Map<ProductViewModel>(_productRepository.GetProductByConnectionID(connectionID));
+
+        if (productDto == null)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(productDto);
+    }
 
     [AuthFilter]
     [HttpPost]
@@ -251,4 +268,7 @@ public class ProductsController : ControllerBase
 
         return NoContent();
     }
+
+
+ 
 }

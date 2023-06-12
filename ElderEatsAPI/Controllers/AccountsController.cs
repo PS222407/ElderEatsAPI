@@ -3,6 +3,7 @@ using ElderEatsAPI.Models;
 using ElderEatsAPI.Interfaces;
 using AutoMapper;
 using ElderEatsAPI.Auth;
+using Microsoft.CodeAnalysis;
 using ElderEatsAPI.Middleware;
 using ElderEatsAPI.Requests;
 using ElderEatsAPI.ViewModels;

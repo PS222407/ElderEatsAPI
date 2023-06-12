@@ -151,7 +151,6 @@ public class ProductRepository : IProductRepository
     {
         return _context.SaveChanges() > 0;
     }
-
     public Product? GetProductByConnectionID(int AccountProductID)
     {
         Product p = null;
