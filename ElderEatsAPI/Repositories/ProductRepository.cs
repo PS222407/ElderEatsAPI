@@ -84,6 +84,10 @@ public class ProductRepository : IProductRepository
     {
         return _context.Products.FirstOrDefault(p => p.Id == id);
     }
+    public Product? GetProduct(long id)
+    {
+        return _context.Products.FirstOrDefault(p => p.Id == id);
+    }
 
     public Product? GetProductByBarcode(string barcode)
     {
@@ -146,5 +150,19 @@ public class ProductRepository : IProductRepository
     private bool Save()
     {
         return _context.SaveChanges() > 0;
+    }
+
+    public Product? GetProductByConnectionID(int AccountProductID)
+    {
+        Product p = null;
+
+        AccountProduct? ap = _context.AccountProducts.FirstOrDefault(ap => ap.Id == AccountProductID);
+        if (ap != null)
+        {
+            p = GetProduct(ap.ProductId);
+        }
+
+        return p;
+
     }
 }

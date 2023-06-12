@@ -76,7 +76,7 @@ public class AccountRepository : IAccountRepository
     {
         return _context.AccountProducts
             .Where(ap => ap.AccountId == id)
-            .Where(ap => ap.ExpirationDate > DateTime.Now || ap.ExpirationDate == null)
+            .Where(ap => ap.RanOutAt > DateTime.Now || ap.RanOutAt == null)
             .Select(p => p.Product)
             .ToList();
     }
@@ -163,6 +163,22 @@ public class AccountRepository : IAccountRepository
     public bool ProductExists(int id)
     {
         return _context.Products.Any(a => a.Id == id);
+
+    }
+    public FixedProduct StoreFixedProduct(int accountId, int productId)
+    {
+        FixedProduct fixedProduct = new FixedProduct();
+
+        fixedProduct.ProductId = productId;
+        fixedProduct.AccountId = accountId;
+        fixedProduct.isActive = true;
+        fixedProduct.UpdatedAt = DateTime.Now;
+        fixedProduct.CreatedAt = DateTime.Now;
+
+        _context.FixedProducts.Add(fixedProduct);
+        _context.SaveChanges();
+
+        return fixedProduct;
     }
 
     private bool Save()
@@ -188,6 +204,36 @@ public class AccountRepository : IAccountRepository
         return fixedProduct;
 
 
+    }
+
+    public bool AddProductToAccount(AccountProduct accountProductDto)
+    {
+
+        accountProductDto.UpdatedAt = DateTime.Now;
+        accountProductDto.CreatedAt= DateTime.Now;
+
+        _context.Add(accountProductDto);
+
+        return Save() ? true : false;
+    }
+
+    public bool AccountProductExists(int AccountProductID)
+    {
+        AccountProduct? ap = _context.AccountProducts.FirstOrDefault(ap => ap.Id == AccountProductID);
+
+        if(ap == null)
+        {
+            return false;
+        }else
+        {
+            return true;
+        }
+
+    }
+
+    public bool ProductExists(int id)
+    {
+        return _context.Products.Any(a => a.Id == id);
     }
 
 }

@@ -12,8 +12,9 @@ public interface IProductRepository
     public PaginateDto<ProductGroupedDto> GetProductsFromAccountPaginated(string? name, int skip, int take);
 
     public Product? GetProduct(int id);
-
-    public PaginateDto<Product> SearchProductsByNamePaginated(string? name, int skip, int take);
+        public Product? GetProduct(long id);
+        
+    public ProductPaginateDto SearchProductsByNamePaginated(string? name, int? skip, int? take);
 
     public Product? GetProductByBarcode(string barcode);
 
@@ -22,4 +23,6 @@ public interface IProductRepository
     public bool DeleteProductFromAccountById(int accountProductId);
 
     public bool UpdateProductExpirationDateFromAccountById(int id, DateTime date);
+
+    public Product? GetProductByConnectionID(int AccountProductID);
 }

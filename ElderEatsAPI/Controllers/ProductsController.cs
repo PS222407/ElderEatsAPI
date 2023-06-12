@@ -176,8 +176,8 @@ public class ProductsController : ControllerBase
         return Ok(paginatedViewModel);
     }
 
-    [AuthFilter]
-    [HttpGet("Product/{barcode}")]
+    [AuthFilter] 
+    [HttpGet("product/barcode/{barcode}")]
     public IActionResult GetProductByBarcode(string barcode)
     {
         ProductViewModel productViewModel = _mapper.Map<ProductViewModel>(_productRepository.GetProductByBarcode(barcode));
@@ -193,6 +193,23 @@ public class ProductsController : ControllerBase
         }
 
         return Ok(productViewModel);
+    }
+    [HttpGet("product/connection/{connectionID}")]
+    public IActionResult GetProductByConnectionID(int connectionID)
+    {
+        ProductViewModel productDto = _mapper.Map<ProductViewModel>(_productRepository.GetProductByConnectionID(connectionID));
+
+        if (productDto == null)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(productDto);
     }
 
     [AuthFilter]
