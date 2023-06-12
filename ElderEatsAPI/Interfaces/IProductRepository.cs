@@ -11,6 +11,8 @@ public interface IProductRepository
 
     public Product? GetProduct(int id);
 
+    public Product? GetProduct(long id);
+
     public ProductPaginateDto SearchProductsByNamePaginated(string? name, int? skip, int? take);
 
     public Product? GetProductByBarcode(string barcode);
@@ -20,4 +22,6 @@ public interface IProductRepository
     public bool DeleteProductFromAccountById(int id);
 
     public bool UpdateProductExpirationDateFromAccountById(int id, DateTime date);
+
+    public Product? GetProductByConnectionID(int AccountProductID);
 }

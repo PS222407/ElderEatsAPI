@@ -94,10 +94,27 @@ public class ProductsController : ControllerBase
         return Ok(productPaginatedViewModel);
     }
     
-    [HttpGet("product/{barcode}")]
+    [HttpGet("product/barcode/{barcode}")]
     public IActionResult GetProductByBarcode(string barcode)
     {
         ProductViewModel productDto = _mapper.Map<ProductViewModel>(_productRepository.GetProductByBarcode(barcode));
+
+        if (productDto == null)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(productDto);
+    }
+    [HttpGet("product/connection/{connectionID}")]
+    public IActionResult GetProductByConnectionID(int connectionID)
+    {
+        ProductViewModel productDto = _mapper.Map<ProductViewModel>(_productRepository.GetProductByConnectionID(connectionID));
 
         if (productDto == null)
         {
@@ -185,5 +202,7 @@ public class ProductsController : ControllerBase
         return NoContent();
     
     }
+
+
  
 }
