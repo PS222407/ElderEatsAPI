@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ElderEatsAPI.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/v2/[controller]")]
 public class UserController : ControllerBase
 {
     private readonly IUserRepository _userRepository;

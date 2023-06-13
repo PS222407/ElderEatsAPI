@@ -9,7 +9,7 @@ using ElderEatsAPI.ViewModels;
 
 namespace ElderEatsAPI.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/v2/[controller]")]
 [ApiController]
 public class AccountsController : ControllerBase
 {

@@ -74,7 +74,7 @@ public class AccountRepository : IAccountRepository
     {
         return _context.AccountProducts
             .Where(ap => ap.AccountId == id)
-            .Where(ap => ap.ExpirationDate > DateTime.Now || ap.ExpirationDate == null)
+            .Where(ap => ap.RanOutAt > DateTime.Now || ap.RanOutAt == null)
             .Select(p => p.Product)
             .ToList();
     }
