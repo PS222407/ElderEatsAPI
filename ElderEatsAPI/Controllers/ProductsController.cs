@@ -77,7 +77,7 @@ public class ProductsController : ControllerBase
     }
     
     // products from account with count of products ordered by expiration date paginate 4 with search
-    [HttpGet("Products/Account/Search/{name}", Name = "SearchProductsFromAccountPaginated")]
+    [HttpGet("Account/Search/{name}", Name = "SearchProductsFromAccountPaginated")]
     public IActionResult SearchProductsFromAccountPaginated([FromRoute] string? name, int take, int page)
     {
         if (page <= 0)
