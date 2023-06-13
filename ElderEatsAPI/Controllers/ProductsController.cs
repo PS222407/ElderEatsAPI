@@ -9,7 +9,7 @@ using ElderEatsAPI.ViewModels;
 
 namespace ElderEatsAPI.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/v2/[controller]")]
 [ApiController]
 public class ProductsController : ControllerBase
 {
@@ -77,7 +77,7 @@ public class ProductsController : ControllerBase
     }
     
     // products from account with count of products ordered by expiration date paginate 4 with search
-    [HttpGet("/abc/def/ghi/{name}", Name = "SearchProductsFromAccountPaginated")]
+    [HttpGet("Products/Account/Search/{name}", Name = "SearchProductsFromAccountPaginated")]
     public IActionResult SearchProductsFromAccountPaginated([FromRoute] string? name, int take, int page)
     {
         if (page <= 0)
