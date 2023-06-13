@@ -33,6 +33,8 @@ public interface IAccountRepository
 
     public AccountUser? FindAccountUser(int accountId, int userId);
 
+    List<AccountUser>? GetAccountsFromUser(int userId);
+
     public bool AccountExists(int id);
 
     public bool AddProductToAccount(AccountProduct accountProduct);

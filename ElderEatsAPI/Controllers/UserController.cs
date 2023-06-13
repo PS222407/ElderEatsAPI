@@ -5,6 +5,7 @@ using ElderEatsAPI.Models;
 using ElderEatsAPI.Requests;
 using ElderEatsAPI.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel;
 
 namespace ElderEatsAPI.Controllers;
 
@@ -33,6 +34,35 @@ public class UserController : ControllerBase
         }
 
         return Ok(_mapper.Map<UserRegistrationViewModel>(userValidationDto.User));
+    }
+    [HttpPost("{userId}/Accounts")]
+    public IActionResult GetAccounts([FromRoute] int userId)
+    {
+
+        if(userId == null)
+        {
+            ModelState.AddModelError("", "no user");
+            return BadRequest(ModelState);
+        }
+        List<Account> accounts = _userRepository.getConnectedAccounts(userId,false);
+
+        return Ok(accounts);
+        
+    }
+
+    [HttpPost("{userId}/Accounts/Active")]
+    public IActionResult GetAccountsActive([FromRoute] int userId)
+    {
+
+        if (userId == null)
+        {
+            ModelState.AddModelError("", "no user");
+            return BadRequest(ModelState);
+        }
+        List<Account> accounts = _userRepository.getConnectedAccounts(userId);
+
+        return Ok(accounts);
+
     }
 
     [HttpPost("Login")]

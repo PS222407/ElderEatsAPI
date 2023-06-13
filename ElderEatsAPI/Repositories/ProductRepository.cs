@@ -3,6 +3,7 @@ using ElderEatsAPI.Data;
 using ElderEatsAPI.Dto;
 using ElderEatsAPI.Interfaces;
 using ElderEatsAPI.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ElderEatsAPI.Repositories;
 
@@ -109,7 +110,19 @@ public class ProductRepository : IProductRepository
             Count = count,
         };
     }
+    public bool StoreProductImageLink(int productID, string ImageUrl)
+    {
+        Product? product = _context.Products.FirstOrDefault(ap => ap.Id == productID);
 
+        if (product == null)
+        {
+            return false;
+        }
+
+        product.Image = ImageUrl;
+
+        return Save();
+    }
     public bool StoreProduct(Product product)
     {
         product.CreatedAt = DateTime.Now;
@@ -132,6 +145,7 @@ public class ProductRepository : IProductRepository
 
         return Save();
     }
+
 
     public bool UpdateProductExpirationDateFromAccountById(int accountProductId, DateTime date)
     {
@@ -164,4 +178,6 @@ public class ProductRepository : IProductRepository
         return p;
 
     }
+
+
 }

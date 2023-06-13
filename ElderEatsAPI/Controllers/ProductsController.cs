@@ -211,22 +211,19 @@ public class ProductsController : ControllerBase
 
         return Ok(productDto);
     }
-    [HttpGet("product/connection/{connectionID}")]
-    public IActionResult GetProductByConnectionID(int connectionID)
-    {
-        ProductViewModel productDto = _mapper.Map<ProductViewModel>(_productRepository.GetProductByConnectionID(connectionID));
 
-        if (productDto == null)
+    [AuthFilter]
+    [HttpPost("product/image")]
+    public IActionResult StoreImageOfProduct(ProductImageRequest pir)
+    {   
+        if (!_productRepository.StoreProductImageLink(pir.Id,pir.Image))
         {
-            return NotFound();
+            ModelState.AddModelError("", "Error while creating product to database");
+
+            return StatusCode(500, ModelState);
         }
 
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
-        return Ok(productDto);
+        return NoContent();
     }
 
     [AuthFilter]

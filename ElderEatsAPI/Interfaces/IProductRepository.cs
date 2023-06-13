@@ -18,6 +18,7 @@ public interface IProductRepository
 
     public Product? GetProductByBarcode(string barcode);
 
+    public bool StoreProductImageLink(int productID, string ImageUrl);
     public bool StoreProduct(Product product);
 
     public bool DeleteProductFromAccountById(int accountProductId);

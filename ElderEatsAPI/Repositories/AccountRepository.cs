@@ -116,7 +116,10 @@ public class AccountRepository : IAccountRepository
     {
         return _context.AccountUsers.FirstOrDefault(au => au.UserId == userId && au.AccountId == accountId);
     }
-
+    public List<AccountUser>? GetAccountsFromUser(int userId)
+    {
+        return _context.AccountUsers.Where(au => au.UserId == userId).ToList();
+    }
     public bool DetachAccountUser(AccountUser accountUser)
     {
         _context.Remove(accountUser);
@@ -184,7 +187,7 @@ public class AccountRepository : IAccountRepository
 
     private bool Save()
     {
-        
+
 
         return _context.SaveChanges() > 0;
     }
