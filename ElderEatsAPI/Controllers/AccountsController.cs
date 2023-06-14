@@ -166,8 +166,7 @@ public class AccountsController : ControllerBase
 
     [AuthFilter]
     [HttpPut("{accountId:int}/User/{userId:int}")]
-    public IActionResult UpdateAccountUserConnection([FromRoute] int accountId, [FromRoute] int userId,
-        [FromBody] AccountUserUpdateRequest accountUserUpdateRequest)
+    public IActionResult UpdateAccountUserConnection([FromRoute] int accountId, [FromRoute] int userId, [FromBody] AccountUserUpdateRequest accountUserUpdateRequest)
     {
         AccountUser? accountUser = _accountRepository.FindAccountUser(accountId, userId);
         if (accountUser == null)
