@@ -16,12 +16,14 @@ public class MappingProfiles : Profile
         CreateMap<Product, ProductViewModel>();
         CreateMap<User, UserViewModel>();
         CreateMap<ProductGroupedDto, ProductGroupedViewModel>();
-        
+
         CreateMap<AccountStoreRequest, Account>();
         CreateMap<UserRegistrationRequest, User>();
         CreateMap<UserLoginRequest, User>();
         CreateMap<User, UserRegistrationViewModel>();
         CreateMap<AccountUserUpdateRequest, AccountUser>();
         CreateMap<ProductStoreRequest, Product>();
+
+        CreateMap<ProductImageRequest, Product>();
     }
 }

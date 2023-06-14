@@ -1,4 +1,5 @@
-﻿using ElderEatsAPI.Models;
+﻿using ElderEatsAPI.Dto;
+using ElderEatsAPI.Models;
 
 namespace ElderEatsAPI.Interfaces;
 
@@ -31,6 +32,8 @@ public interface IAccountRepository
     public bool DetachAccountUser(AccountUser accountUser);
 
     public AccountUser? FindAccountUser(int accountId, int userId);
+
+    public List<AccountUser>? GetAccountsFromUser(int userId);
 
     public bool AccountExists(int id);
 

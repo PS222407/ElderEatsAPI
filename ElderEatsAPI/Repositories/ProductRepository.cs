@@ -3,6 +3,7 @@ using ElderEatsAPI.Data;
 using ElderEatsAPI.Dto;
 using ElderEatsAPI.Interfaces;
 using ElderEatsAPI.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ElderEatsAPI.Repositories;
 
@@ -85,6 +86,11 @@ public class ProductRepository : IProductRepository
         return _context.Products.FirstOrDefault(p => p.Id == id);
     }
 
+    public Product? GetProduct(long id)
+    {
+        return _context.Products.FirstOrDefault(p => p.Id == id);
+    }
+
     public Product? GetProductByBarcode(string barcode)
     {
         return _context.Products.FirstOrDefault(p => p.Barcode == barcode);
@@ -104,6 +110,20 @@ public class ProductRepository : IProductRepository
             Items = list,
             Count = count,
         };
+    }
+
+    public bool StoreProductImageLink(int productID, string ImageUrl)
+    {
+        Product? product = _context.Products.FirstOrDefault(ap => ap.Id == productID);
+
+        if (product == null)
+        {
+            return false;
+        }
+
+        product.Image = ImageUrl;
+
+        return Save();
     }
 
     public bool StoreProduct(Product product)
@@ -129,6 +149,7 @@ public class ProductRepository : IProductRepository
         return Save();
     }
 
+
     public bool UpdateProductExpirationDateFromAccountById(int accountProductId, DateTime date)
     {
         AccountProduct? accountProduct = _context.AccountProducts.FirstOrDefault(ap => ap.Id == accountProductId);
@@ -146,5 +167,18 @@ public class ProductRepository : IProductRepository
     private bool Save()
     {
         return _context.SaveChanges() > 0;
+    }
+
+    public Product? GetProductByConnectionID(int AccountProductID)
+    {
+        Product p = null;
+
+        AccountProduct? ap = _context.AccountProducts.FirstOrDefault(ap => ap.Id == AccountProductID);
+        if (ap != null)
+        {
+            p = GetProduct(ap.ProductId);
+        }
+
+        return p;
     }
 }

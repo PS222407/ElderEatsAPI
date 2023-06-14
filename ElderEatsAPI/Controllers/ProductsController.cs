@@ -22,7 +22,7 @@ public class ProductsController : ControllerBase
         _productRepository = productRepository;
         _mapper = mapper;
     }
-    
+
     [AuthFilter]
     [HttpGet]
     public IActionResult GetProducts()
@@ -45,12 +45,12 @@ public class ProductsController : ControllerBase
         {
             return BadRequest("Page cannot be 0 or less");
         }
-    
+
         if (take <= 0)
         {
             return BadRequest("Take cannot be 0 or less");
         }
-    
+
         PaginateDto<Product> paginateDto = _productRepository.GetActiveProductsFromAccount(take * (page - 1), take);
 
         PaginateDto<ProductViewModel> paginateDtoViewModel = new PaginateDto<ProductViewModel>();
@@ -67,7 +67,7 @@ public class ProductsController : ControllerBase
             HttpContext,
             Url
         );
-        
+
         if (page > paginatedViewModel.Paginate.LastPage)
         {
             return BadRequest("Given page is larger than MaxPage");
@@ -75,7 +75,7 @@ public class ProductsController : ControllerBase
 
         return Ok(paginatedViewModel);
     }
-    
+
     // products from account with count of products ordered by expiration date paginate 4 with search
     [HttpGet("Account/Search/{name}", Name = "SearchProductsFromAccountPaginated")]
     public IActionResult SearchProductsFromAccountPaginated([FromRoute] string? name, int take, int page)
@@ -89,7 +89,7 @@ public class ProductsController : ControllerBase
         {
             return BadRequest("Take cannot be 0 or less");
         }
-        
+
         PaginateDto<ProductGroupedDto> paginateDto = _productRepository.GetProductsFromAccountPaginated(name, take * (page - 1), take);
 
         PaginateDto<ProductGroupedViewModel> paginateDtoViewModel = new PaginateDto<ProductGroupedViewModel>();
@@ -103,9 +103,10 @@ public class ProductsController : ControllerBase
             };
             productGroupedViewModels.Add(productGroupedViewModel);
         }
+
         paginateDtoViewModel.Items = productGroupedViewModels;
         paginateDtoViewModel.Count = paginateDto.Count;
-        
+
         PaginatedViewModel<ProductGroupedViewModel> paginatedViewModel = new PaginatedViewModel<ProductGroupedViewModel>(
             paginateDtoViewModel,
             page,
@@ -114,7 +115,7 @@ public class ProductsController : ControllerBase
             HttpContext,
             Url
         );
-        
+
         if (page > paginatedViewModel.Paginate.LastPage)
         {
             return BadRequest("Given page is larger than MaxPage");
@@ -150,17 +151,17 @@ public class ProductsController : ControllerBase
         {
             return BadRequest("Page cannot be 0 or less");
         }
-    
+
         if (take <= 0)
         {
             return BadRequest("Take cannot be 0 or less");
         }
-    
+
         PaginateDto<Product> paginateDto = _productRepository.SearchProductsByNamePaginated(name, take * (page - 1), take);
 
         PaginateDto<ProductViewModel> paginateDtoViewModel = new PaginateDto<ProductViewModel>();
         var productViewModels = _mapper.Map<List<ProductViewModel>>(paginateDto.Items);
-        
+
         paginateDtoViewModel.Items = productViewModels;
         paginateDtoViewModel.Count = paginateDto.Count;
 
@@ -177,7 +178,7 @@ public class ProductsController : ControllerBase
     }
 
     [AuthFilter]
-    [HttpGet("Product/{barcode}")]
+    [HttpGet("Product/Barcode/{barcode}")]
     public IActionResult GetProductByBarcode(string barcode)
     {
         ProductViewModel productViewModel = _mapper.Map<ProductViewModel>(_productRepository.GetProductByBarcode(barcode));
@@ -193,6 +194,38 @@ public class ProductsController : ControllerBase
         }
 
         return Ok(productViewModel);
+    }
+
+    [HttpGet("Product/Connection/{connectionID}")]
+    public IActionResult GetProductByConnectionID(int connectionID)
+    {
+        ProductViewModel productDto = _mapper.Map<ProductViewModel>(_productRepository.GetProductByConnectionID(connectionID));
+
+        if (productDto == null)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(productDto);
+    }
+
+    [AuthFilter]
+    [HttpPost("Product/Image")]
+    public IActionResult StoreImageOfProduct(ProductImageRequest pir)
+    {
+        if (!_productRepository.StoreProductImageLink(pir.Id, pir.Image))
+        {
+            ModelState.AddModelError("", "Error while creating product to database");
+
+            return StatusCode(500, ModelState);
+        }
+
+        return NoContent();
     }
 
     [AuthFilter]
@@ -222,7 +255,7 @@ public class ProductsController : ControllerBase
 
         return NoContent();
     }
-    
+
     [AuthFilter]
     [HttpDelete("Account/{accountProductId:int}")]
     public IActionResult DeleteProductFromAccountById(int accountProductId)

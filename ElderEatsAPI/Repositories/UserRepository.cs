@@ -2,6 +2,7 @@
 using ElderEatsAPI.Dto;
 using ElderEatsAPI.Interfaces;
 using ElderEatsAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ElderEatsAPI.Repositories;
 
@@ -13,7 +14,7 @@ public class UserRepository : IUserRepository
     {
         _context = context;
     }
-    
+
     public UserValidationDto Register(User user)
     {
         UserValidationDto userValidationDto = new UserValidationDto();
@@ -22,7 +23,7 @@ public class UserRepository : IUserRepository
             userValidationDto.Reason = "Email is already taken, please go to login";
             return userValidationDto;
         }
-        
+
         user.Token = Guid.NewGuid().ToString();
         user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
         _context.Users.Add(user);
@@ -70,5 +71,30 @@ public class UserRepository : IUserRepository
     private bool Save()
     {
         return _context.SaveChanges() > 0;
+    }
+
+    public List<Account?>? getConnectedAccounts(int user, bool ActiveAccountsOnly = true)
+    {
+        List<AccountUser> accountusers = new List<AccountUser>();
+        List<Account?> accounts = new List<Account?>();
+
+        if (user != null)
+        {
+            if (ActiveAccountsOnly)
+            {
+                accountusers = _context.AccountUsers.Where(au => au.UserId == user && au.Status == 0).ToList();
+            }
+            else
+            {
+                accountusers = _context.AccountUsers.Where(au => au.UserId == user).ToList();
+            }
+
+            foreach (AccountUser accountUser in accountusers)
+            {
+                accounts.Add(_context.Accounts.Where(a => a.Id == accountUser.AccountId).FirstOrDefault());
+            }
+        }
+
+        return accounts;
     }
 }

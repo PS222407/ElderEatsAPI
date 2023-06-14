@@ -1,8 +1,11 @@
 ﻿using ElderEatsAPI.Data;
+using ElderEatsAPI.Dto;
 using ElderEatsAPI.Enums;
+using ElderEatsAPI.Dto;
 using ElderEatsAPI.Interfaces;
 using ElderEatsAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 
 namespace ElderEatsAPI.Repositories;
 
@@ -114,6 +117,11 @@ public class AccountRepository : IAccountRepository
         return _context.AccountUsers.FirstOrDefault(au => au.UserId == userId && au.AccountId == accountId);
     }
 
+    public List<AccountUser>? GetAccountsFromUser(int userId)
+    {
+        return _context.AccountUsers.Where(au => au.UserId == userId).ToList();
+    }
+
     public bool DetachAccountUser(AccountUser accountUser)
     {
         _context.Remove(accountUser);
@@ -158,6 +166,11 @@ public class AccountRepository : IAccountRepository
         return ap == null;
     }
 
+    public bool ProductExists(int id)
+    {
+        return _context.Products.Any(a => a.Id == id);
+    }
+
     public FixedProduct StoreFixedProduct(int accountId, int productId)
     {
         FixedProduct fixedProduct = new FixedProduct();
@@ -172,11 +185,6 @@ public class AccountRepository : IAccountRepository
         _context.SaveChanges();
 
         return fixedProduct;
-    }
-
-    public bool ProductExists(int id)
-    {
-        return _context.Products.Any(a => a.Id == id);
     }
 
     private bool Save()
