@@ -166,7 +166,8 @@ public class AccountsController : ControllerBase
 
     [AuthFilter]
     [HttpPut("{accountId:int}/User/{userId:int}")]
-    public IActionResult UpdateAccountUserConnection([FromRoute] int accountId, [FromRoute] int userId, [FromBody] AccountUserUpdateRequest accountUserUpdateRequest)
+    public IActionResult UpdateAccountUserConnection([FromRoute] int accountId, [FromRoute] int userId,
+        [FromBody] AccountUserUpdateRequest accountUserUpdateRequest)
     {
         AccountUser? accountUser = _accountRepository.FindAccountUser(accountId, userId);
         if (accountUser == null)
@@ -209,18 +210,16 @@ public class AccountsController : ControllerBase
 
         return NoContent();
     }
-    [HttpPut("{accountId:int}/products/{productId:int}/create")]
+
+    [HttpPut("{accountId:int}/Products/{productId:int}/Create")]
     public IActionResult CreateAccountProductConnection([FromRoute] int accountId, [FromRoute] int productId)
     {
         AccountProductDto accountProductDto = new AccountProductDto();
-
         accountProductDto.AccountId = accountId;
         accountProductDto.ProductId = productId;
 
         if (!ModelState.IsValid)
             return BadRequest();
-
-
         if (!_accountRepository.AddProductToAccount(_mapper.Map<AccountProduct>(accountProductDto)))
         {
             ModelState.AddModelError("", "Adding product went wrong");
@@ -231,10 +230,9 @@ public class AccountsController : ControllerBase
         return NoContent();
     }
 
-    [HttpPut("products/{connectionID:int}/ranout")]
+    [HttpPut("Products/{connectionID:int}/RanOut")]
     public IActionResult AccountProductRanout([FromRoute] int connectionID)
     {
-
         if (!ModelState.IsValid)
             return BadRequest();
 
@@ -249,24 +247,19 @@ public class AccountsController : ControllerBase
         return NoContent();
     }
 
-    [HttpPut("{accountId:int}/fixedproducts/{productid:int}/ranout")]
+    [HttpPut("{accountId:int}/FixedProducts/{productid:int}/RanOut")]
     public IActionResult AddFixedProduct([FromRoute] int accountId, [FromRoute] int productid)
     {
-
         if (!ModelState.IsValid)
             return BadRequest();
-        if(!_accountRepository.AccountExists(accountId) || !_accountRepository.ProductExists(productid))
+        if (!_accountRepository.AccountExists(accountId) || !_accountRepository.ProductExists(productid))
         {
             ModelState.AddModelError("", "Adding fixed product went wrong");
 
             return StatusCode(500, ModelState);
         }
-        else
-        {
-            _accountRepository.StoreFixedProduct(accountId, productid);
-        }
 
-
+        _accountRepository.StoreFixedProduct(accountId, productid);
 
         return NoContent();
     }

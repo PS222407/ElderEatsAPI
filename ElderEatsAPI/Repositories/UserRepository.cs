@@ -14,7 +14,7 @@ public class UserRepository : IUserRepository
     {
         _context = context;
     }
-    
+
     public UserValidationDto Register(User user)
     {
         UserValidationDto userValidationDto = new UserValidationDto();
@@ -23,7 +23,7 @@ public class UserRepository : IUserRepository
             userValidationDto.Reason = "Email is already taken, please go to login";
             return userValidationDto;
         }
-        
+
         user.Token = Guid.NewGuid().ToString();
         user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
         _context.Users.Add(user);
@@ -82,18 +82,19 @@ public class UserRepository : IUserRepository
         {
             if (ActiveAccountsOnly)
             {
-                accountusers = _context.AccountUsers.Where(au => au.UserId == user&& au.Status == 0).ToList();
+                accountusers = _context.AccountUsers.Where(au => au.UserId == user && au.Status == 0).ToList();
             }
             else
             {
                 accountusers = _context.AccountUsers.Where(au => au.UserId == user).ToList();
             }
+
             foreach (AccountUser accountUser in accountusers)
             {
-                accounts.Add(_context.Accounts.Where(a=>a.Id == accountUser.AccountId).FirstOrDefault());
+                accounts.Add(_context.Accounts.Where(a => a.Id == accountUser.AccountId).FirstOrDefault());
             }
         }
+
         return accounts;
     }
-
 }

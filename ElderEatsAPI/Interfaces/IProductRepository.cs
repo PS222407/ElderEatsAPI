@@ -12,8 +12,8 @@ public interface IProductRepository
     public PaginateDto<ProductGroupedDto> GetProductsFromAccountPaginated(string? name, int skip, int take);
 
     public Product? GetProduct(int id);
-        public Product? GetProduct(long id);
-        
+    public Product? GetProduct(long id);
+
     public PaginateDto<Product> SearchProductsByNamePaginated(string? name, int skip, int take);
 
     public Product? GetProductByBarcode(string barcode);

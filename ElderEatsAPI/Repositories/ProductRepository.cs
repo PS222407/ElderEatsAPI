@@ -85,6 +85,7 @@ public class ProductRepository : IProductRepository
     {
         return _context.Products.FirstOrDefault(p => p.Id == id);
     }
+
     public Product? GetProduct(long id)
     {
         return _context.Products.FirstOrDefault(p => p.Id == id);
@@ -110,6 +111,7 @@ public class ProductRepository : IProductRepository
             Count = count,
         };
     }
+
     public bool StoreProductImageLink(int productID, string ImageUrl)
     {
         Product? product = _context.Products.FirstOrDefault(ap => ap.Id == productID);
@@ -123,6 +125,7 @@ public class ProductRepository : IProductRepository
 
         return Save();
     }
+
     public bool StoreProduct(Product product)
     {
         product.CreatedAt = DateTime.Now;
@@ -165,6 +168,7 @@ public class ProductRepository : IProductRepository
     {
         return _context.SaveChanges() > 0;
     }
+
     public Product? GetProductByConnectionID(int AccountProductID)
     {
         Product p = null;
@@ -176,8 +180,5 @@ public class ProductRepository : IProductRepository
         }
 
         return p;
-
     }
-
-
 }

@@ -16,7 +16,7 @@ public class MappingProfiles : Profile
         CreateMap<Product, ProductViewModel>();
         CreateMap<User, UserViewModel>();
         CreateMap<ProductGroupedDto, ProductGroupedViewModel>();
-        
+
         CreateMap<AccountStoreRequest, Account>();
         CreateMap<UserRegistrationRequest, User>();
         CreateMap<UserLoginRequest, User>();
@@ -24,6 +24,6 @@ public class MappingProfiles : Profile
         CreateMap<AccountUserUpdateRequest, AccountUser>();
         CreateMap<ProductStoreRequest, Product>();
 
-        CreateMap<ProductImageRequest,Product>();
+        CreateMap<ProductImageRequest, Product>();
     }
 }
