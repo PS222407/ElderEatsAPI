@@ -2,6 +2,8 @@
 
 public class AccountProductViewModel
 {
+    public int? Id { get; set; }
+    
     public DateTime? ExpirationDate { get; set; }
 
     public DateTime? RanOutAt { get; set; }

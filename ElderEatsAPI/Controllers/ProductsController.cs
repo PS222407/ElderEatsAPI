@@ -77,6 +77,7 @@ public class ProductsController : ControllerBase
     }
 
     // products from account with count of products ordered by expiration date paginate 4 with search
+    [AccountAuthFilter("account")]
     [HttpGet("Account/Search/{name}", Name = "SearchProductsFromAccountPaginated")]
     public IActionResult SearchProductsFromAccountPaginated([FromRoute] string? name, int take, int page)
     {
@@ -98,6 +99,7 @@ public class ProductsController : ControllerBase
         {
             ProductGroupedViewModel productGroupedViewModel = new ProductGroupedViewModel
             {
+                AccountProduct = _mapper.Map<AccountProductViewModel>(item.Product.AccountProducts[0]),
                 Product = _mapper.Map<ProductViewModel>(item.Product),
                 Count = item.Count,
             };

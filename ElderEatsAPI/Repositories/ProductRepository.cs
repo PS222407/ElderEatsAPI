@@ -55,7 +55,7 @@ public class ProductRepository : IProductRepository
             .GroupBy(joined => new { joined.AccountProduct.ProductId, joined.AccountProduct.ExpirationDate })
             .OrderBy(g => g.Key.ExpirationDate == null)
             .ThenBy(g => g.Key.ExpirationDate)
-            .Select(g => new { g.FirstOrDefault().Product, Count = g.Count() });
+            .Select(g => new { g.FirstOrDefault().Product, Count = g.Count(), g.FirstOrDefault().AccountProduct });
 
         int count = query.Count();
         var list = query
