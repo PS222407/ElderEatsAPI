@@ -17,7 +17,7 @@ namespace ElderEatsAPI.Controllers;
 public class AccountsController : ControllerBase
 {
     private readonly IAccountRepository _accountRepository;
-    private readonly IProductRepository _productRepository;
+    //private readonly IProductRepository _productRepository;
     private readonly IMapper _mapper;
 
     public AccountsController(IAccountRepository accountRepository, IMapper mapper)
@@ -304,12 +304,6 @@ public class AccountsController : ControllerBase
         return NoContent();
     }
 
-    [HttpPut("{accountId:int}/FixedProducts/{productid:int}/RanOut")]
-    public IActionResult AddFixedProduct([FromRoute] int accountId, [FromRoute] int productid)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest();
-        if (!_accountRepository.AccountExists(accountId) || !_accountRepository.ProductExists(productid))
     [AuthFilter]
     [HttpGet("{accountId:int}/Fixedproducts/")]
     public IActionResult GetFixedProducts([FromRoute] int accountId)
@@ -318,45 +312,15 @@ public class AccountsController : ControllerBase
         List<FixedProduct> fp = new List<FixedProduct>();
 
         fp = _accountRepository.GetFixedProducts(accountId);
-        
+
         return Ok(fp);
     }
-
     [HttpPut("{accountId:int}/Fixedproducts/{productid:int}/Ranout")]
     public IActionResult AddFixedProduct([FromRoute] int accountId, [FromRoute] int productid)
     {
         if (!ModelState.IsValid)
             return BadRequest();
-        if(!_accountRepository.AccountExists(accountId) || !_productRepository.ProductExists(productid))
-        {
-            ModelState.AddModelError("", "Adding fixed product went wrong");
-
-            return StatusCode(500, ModelState);
-        }
-
-        _accountRepository.StoreFixedProduct(accountId, productid);
-
-        return NoContent();
-    }
-}
- [AuthFilter]
-    [HttpGet("{accountId:int}/Fixedproducts/")]
-    public IActionResult GetFixedProducts([FromRoute] int accountId)
-    {
-
-        List<FixedProduct> fp = new List<FixedProduct>();
-
-        fp = _accountRepository.GetFixedProducts(accountId);
-        
-        return Ok(fp);
-    }
-
-    [HttpPut("{accountId:int}/Fixedproducts/{productid:int}/Ranout")]
-    public IActionResult AddFixedProduct([FromRoute] int accountId, [FromRoute] int productid)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest();
-        if(!_accountRepository.AccountExists(accountId) || !_productRepository.ProductExists(productid))
+        if (!_accountRepository.AccountExists(accountId) || !_accountRepository.ProductExists(productid))
         {
             ModelState.AddModelError("", "Adding fixed product went wrong");
 
@@ -368,7 +332,7 @@ public class AccountsController : ControllerBase
         }
         return NoContent();
     }
-
+    
     [AuthFilter]
     [HttpPut("{accountId:int}/Fixedproducts/Update")]
     public IActionResult UpdateFixedProducts([FromBody] Dictionary<int, int> data, [FromRoute] int accountId)

@@ -28,5 +28,4 @@ public interface IProductRepository
 
     public Product? GetProductByConnectionID(int AccountProductID);
 
-    public bool ProductExists(int productId);
 }
