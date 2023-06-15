@@ -17,7 +17,6 @@ namespace ElderEatsAPI.Controllers;
 public class AccountsController : ControllerBase
 {
     private readonly IAccountRepository _accountRepository;
-    //private readonly IProductRepository _productRepository;
     private readonly IMapper _mapper;
 
     public AccountsController(IAccountRepository accountRepository, IMapper mapper)
@@ -343,11 +342,9 @@ public class AccountsController : ControllerBase
         if (!_accountRepository.UpdateActiveFixedProducts(data, accountId))
         {
             ModelState.AddModelError("", "products could not be updated");
-
             return StatusCode(500, ModelState);
         }
 
         return NoContent();
     }
-
 }
