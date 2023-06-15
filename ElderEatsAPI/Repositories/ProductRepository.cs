@@ -46,7 +46,7 @@ public class ProductRepository : IProductRepository
         long accountId = Identity.Account!.Id;
 
         var query = _context.AccountProducts
-            .Where(ap => ap.AccountId == accountId && ap.RanOutAt > DateTime.Now)
+            .Where(ap => ap.AccountId == accountId && (ap.RanOutAt > DateTime.Now || ap.RanOutAt == null))
             .Join(_context.Products,
                 ap => ap.ProductId,
                 p => p.Id,
