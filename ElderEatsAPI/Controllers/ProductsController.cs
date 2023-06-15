@@ -177,7 +177,7 @@ public class ProductsController : ControllerBase
     }
 
     [AuthFilter] 
-    [HttpGet("product/barcode/{barcode}")]
+    [HttpGet("Product/Barcode/{barcode}")]
     public IActionResult GetProductByBarcode(string barcode)
     {
         ProductViewModel productViewModel = _mapper.Map<ProductViewModel>(_productRepository.GetProductByBarcode(barcode));
@@ -194,7 +194,7 @@ public class ProductsController : ControllerBase
 
         return Ok(productViewModel);
     }
-    [HttpGet("product/connection/{connectionID}")]
+    [HttpGet("Product/Connection/{connectionID}")]
     public IActionResult GetProductByConnectionID(int connectionID)
     {
         ProductViewModel productDto = _mapper.Map<ProductViewModel>(_productRepository.GetProductByConnectionID(connectionID));
@@ -213,7 +213,7 @@ public class ProductsController : ControllerBase
     }
 
     [AuthFilter]
-    [HttpPost("product/image")]
+    [HttpPost("Product/Image")]
     public IActionResult StoreImageOfProduct(ProductImageRequest pir)
     {   
         if (!_productRepository.StoreProductImageLink(pir.Id,pir.Image))

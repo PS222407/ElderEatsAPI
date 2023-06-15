@@ -179,5 +179,9 @@ public class ProductRepository : IProductRepository
 
     }
 
+    public bool ProductExists(int id)
+    {
+        return _context.Products.Any(a => a.Id == id);
 
+    }
 }

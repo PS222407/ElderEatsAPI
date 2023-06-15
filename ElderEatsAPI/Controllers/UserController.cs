@@ -59,7 +59,12 @@ public class UserController : ControllerBase
             ModelState.AddModelError("", "no user");
             return BadRequest(ModelState);
         }
-        List<Account> accounts = _userRepository.getConnectedAccounts(userId);
+        List<Account>? accounts = _userRepository.getConnectedAccounts(userId);
+
+        if(accounts == null)
+        {
+            return NotFound();
+        }
 
         return Ok(accounts);
 
