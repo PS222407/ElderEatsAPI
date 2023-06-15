@@ -10,6 +10,8 @@ public class AccountProductDto
     [Column(" account_id")] public long AccountId { get; set; }
 
     [Column("product_id")] public long ProductId { get; set; }
+    
+    [Column("amount")] public int Amount { get; set; }
 
     [Column("created_at")] public DateTime? CreatedAt { get; set; }
 

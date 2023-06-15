@@ -210,12 +210,13 @@ public class AccountsController : ControllerBase
         return NoContent();
     }
 
-    [HttpPut("{accountId:int}/Products/{productId:int}/Create")]
-    public IActionResult CreateAccountProductConnection([FromRoute] int accountId, [FromRoute] int productId)
+    [HttpPut("{accountId:int}/Products/{productId:int}/Create/{amount:int}")]
+    public IActionResult CreateAccountProductConnection([FromRoute] int accountId, [FromRoute] int productId, [FromRoute] int amount)
     {
         AccountProductDto accountProductDto = new AccountProductDto();
         accountProductDto.AccountId = accountId;
         accountProductDto.ProductId = productId;
+        accountProductDto.Amount = amount;
 
         if (!ModelState.IsValid)
             return BadRequest();
