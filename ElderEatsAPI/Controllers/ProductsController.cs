@@ -179,7 +179,7 @@ public class ProductsController : ControllerBase
         return Ok(paginatedViewModel);
     }
 
-    [AuthFilter]
+    [AuthFilter] 
     [HttpGet("Product/Barcode/{barcode}")]
     public IActionResult GetProductByBarcode(string barcode)
     {
@@ -197,7 +197,6 @@ public class ProductsController : ControllerBase
 
         return Ok(productViewModel);
     }
-
     [HttpGet("Product/Connection/{connectionID}")]
     public IActionResult GetProductByConnectionID(int connectionID)
     {

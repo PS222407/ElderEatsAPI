@@ -9,13 +9,15 @@ public interface IAccountRepository
 
     public Account? GetAccountByToken(string token);
 
-    public Account? GetAccountByTemporaryToken(string temporaryToken);
+    public Account? GetAccountByTemporaryToken(string temporaryToken, bool NotExpiredOnly = false);
 
     public Account? GetAccountWithUsers(int id);
 
     public Account? GetAccountWithConnectedUsers(int id);
 
     public Account? GetAccountWithProcessingUsers(int id);
+
+    public AccountUser? FindAccountUser(int accountId, int userId);
 
     public List<Product> GetAccountProducts(int id);
 
@@ -31,7 +33,7 @@ public interface IAccountRepository
 
     public bool DetachAccountUser(AccountUser accountUser);
 
-    public AccountUser? FindAccountUser(int accountId, int userId);
+    public AccountUser? CreateAccountUser(int accountId, int userId);
 
     public List<AccountUser>? GetAccountsFromUser(int userId);
 
@@ -46,4 +48,8 @@ public interface IAccountRepository
     public FixedProduct? StoreFixedProduct(int accountId, int productId);
 
     public bool ProductExists(int productId);
+    
+    public List<FixedProduct>? GetFixedProducts(int accountId);
+
+    public bool UpdateActiveFixedProducts(Dictionary<int, int> Data, int accountId);
 }

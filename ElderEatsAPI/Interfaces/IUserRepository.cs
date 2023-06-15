@@ -12,4 +12,6 @@ public interface IUserRepository
     public User? GetUserByToken(string? token);
 
     public List<Account>? getConnectedAccounts(int user, bool ActiveAccountsOnly = true);
+
+    public User? FindUserById(long id);
 }
