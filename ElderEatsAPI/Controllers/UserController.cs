@@ -45,7 +45,12 @@ public class UserController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        List<Account> accounts = _userRepository.getConnectedAccounts(userId, false);
+        List<Account>? accounts = _userRepository.getConnectedAccounts(userId);
+
+        if(accounts == null)
+        {
+            return NotFound();
+        }
 
         return Ok(accounts);
     }

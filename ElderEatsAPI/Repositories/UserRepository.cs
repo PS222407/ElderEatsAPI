@@ -68,6 +68,11 @@ public class UserRepository : IUserRepository
         return _context.Users.FirstOrDefault(u => u.Email == email);
     }
 
+    public User? FindUserById(long id)
+    {
+        return _context.Users.FirstOrDefault(u => u.Id == id);
+    }
+
     private bool Save()
     {
         return _context.SaveChanges() > 0;
@@ -94,7 +99,10 @@ public class UserRepository : IUserRepository
                 accounts.Add(_context.Accounts.Where(a => a.Id == accountUser.AccountId).FirstOrDefault());
             }
         }
-
+        if(accounts.Count == 0)
+        {
+            accounts = null;
+        }
         return accounts;
     }
 }

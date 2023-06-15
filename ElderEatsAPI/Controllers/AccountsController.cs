@@ -17,6 +17,7 @@ namespace ElderEatsAPI.Controllers;
 public class AccountsController : ControllerBase
 {
     private readonly IAccountRepository _accountRepository;
+    private readonly IProductRepository _productRepository;
     private readonly IMapper _mapper;
 
     public AccountsController(IAccountRepository accountRepository, IMapper mapper)
@@ -47,6 +48,24 @@ public class AccountsController : ControllerBase
     public IActionResult GetAccountByTemporaryToken(string temporaryToken)
     {
         AccountViewModel? accountViewModel = _mapper.Map<AccountViewModel>(_accountRepository.GetAccountByTemporaryToken(temporaryToken));
+
+        if (accountViewModel == null)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(accountViewModel);
+    }
+
+    [HttpGet("TemporaryToken/{temporaryToken}/limted")]
+    public IActionResult GetAccountByTemporaryTokenLimted(string temporaryToken)
+    {
+        AccountViewModel? accountViewModel = _mapper.Map<AccountViewModel>(_accountRepository.GetAccountByTemporaryToken(temporaryToken, true));
 
         if (accountViewModel == null)
         {
@@ -118,6 +137,25 @@ public class AccountsController : ControllerBase
         return Ok(accountViewModel);
     }
 
+    [AuthFilter]
+    [HttpGet("{accountID:int}/Users/{userId}/get")]
+    public IActionResult GetAccountUserByIds(int accountID, int userId)
+    {
+        AccountUser? accountuser = _accountRepository.FindAccountUser(accountID, userId);
+
+        if (accountuser == null)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(accountuser);
+    }
+
     [HttpPost]
     public IActionResult StoreAccount([FromBody] AccountStoreRequest accountDto)
     {
@@ -162,6 +200,27 @@ public class AccountsController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    [AccountAuthFilter("account")]
+    [HttpPut("{accountId:int}/User/{userId:int}/Create")]
+    public IActionResult CreateAccountUserConnection([FromRoute] int accountId, [FromRoute] int userId)
+    {
+        AccountUser? accountUser = _accountRepository.CreateAccountUser(accountId, userId);
+
+        if (accountUser == null)
+        {
+            ModelState.AddModelError("", "Account User connection could not be made");
+
+            return StatusCode(500, ModelState);
+        }
+        if (!ModelState.IsValid)
+        {
+            return BadRequest();
+        }
+
+        return Ok(accountUser);
+
     }
 
     [AuthFilter]
@@ -209,7 +268,6 @@ public class AccountsController : ControllerBase
 
         return NoContent();
     }
-
     [HttpPut("{accountId:int}/Products/{productId:int}/Create")]
     public IActionResult CreateAccountProductConnection([FromRoute] int accountId, [FromRoute] int productId)
     {
@@ -229,7 +287,7 @@ public class AccountsController : ControllerBase
         return NoContent();
     }
 
-    [HttpPut("Products/{connectionID:int}/RanOut")]
+    [HttpPut("Products/{connectionID:int}/Ranout")]
     public IActionResult AccountProductRanout([FromRoute] int connectionID)
     {
         if (!ModelState.IsValid)
@@ -252,6 +310,24 @@ public class AccountsController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest();
         if (!_accountRepository.AccountExists(accountId) || !_accountRepository.ProductExists(productid))
+    [AuthFilter]
+    [HttpGet("{accountId:int}/Fixedproducts/")]
+    public IActionResult GetFixedProducts([FromRoute] int accountId)
+    {
+
+        List<FixedProduct> fp = new List<FixedProduct>();
+
+        fp = _accountRepository.GetFixedProducts(accountId);
+        
+        return Ok(fp);
+    }
+
+    [HttpPut("{accountId:int}/Fixedproducts/{productid:int}/Ranout")]
+    public IActionResult AddFixedProduct([FromRoute] int accountId, [FromRoute] int productid)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest();
+        if(!_accountRepository.AccountExists(accountId) || !_productRepository.ProductExists(productid))
         {
             ModelState.AddModelError("", "Adding fixed product went wrong");
 
@@ -262,4 +338,52 @@ public class AccountsController : ControllerBase
 
         return NoContent();
     }
+}
+ [AuthFilter]
+    [HttpGet("{accountId:int}/Fixedproducts/")]
+    public IActionResult GetFixedProducts([FromRoute] int accountId)
+    {
+
+        List<FixedProduct> fp = new List<FixedProduct>();
+
+        fp = _accountRepository.GetFixedProducts(accountId);
+        
+        return Ok(fp);
+    }
+
+    [HttpPut("{accountId:int}/Fixedproducts/{productid:int}/Ranout")]
+    public IActionResult AddFixedProduct([FromRoute] int accountId, [FromRoute] int productid)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest();
+        if(!_accountRepository.AccountExists(accountId) || !_productRepository.ProductExists(productid))
+        {
+            ModelState.AddModelError("", "Adding fixed product went wrong");
+
+            return StatusCode(500, ModelState);
+        }
+        else
+        {
+            _accountRepository.StoreFixedProduct(accountId, productid);
+        }
+        return NoContent();
+    }
+
+    [AuthFilter]
+    [HttpPut("{accountId:int}/Fixedproducts/Update")]
+    public IActionResult UpdateFixedProducts([FromBody] Dictionary<int, int> data, [FromRoute] int accountId)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest();
+
+        if (!_accountRepository.UpdateActiveFixedProducts(data, accountId))
+        {
+            ModelState.AddModelError("", "products could not be updated");
+
+            return StatusCode(500, ModelState);
+        }
+
+        return NoContent();
+    }
+
 }
