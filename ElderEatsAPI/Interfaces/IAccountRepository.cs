@@ -21,8 +21,7 @@ public interface IAccountRepository
 
     public List<Product> GetAccountProducts(int id);
 
-    public List<Product> GetAccountActiveProducts(int id);
-
+    public List<AccountProduct> GetAccountActiveProducts(int id);
     public Account? StoreAccount(Account account);
 
     public bool UpdateAccount(Account account);

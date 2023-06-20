@@ -7,8 +7,10 @@ using Microsoft.CodeAnalysis;
 using ElderEatsAPI.Middleware;
 using ElderEatsAPI.Requests;
 using ElderEatsAPI.ViewModels;
-using Microsoft.CodeAnalysis;
 using ElderEatsAPI.Dto;
+using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using NuGet.Protocol;
 
 namespace ElderEatsAPI.Controllers;
 
@@ -135,6 +137,24 @@ public class AccountsController : ControllerBase
 
         return Ok(accountViewModel);
     }
+    [HttpGet("{accountId:int}/FixedProducts/")]
+    public IActionResult GetFixedProduct([FromRoute] int accountId)
+    {
+        List<FixedProduct>? fixedProducts = _accountRepository.GetFixedProducts(accountId);
+
+
+        if (fixedProducts == null)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(fixedProducts);
+    }
 
     [AuthFilter]
     [HttpGet("{accountID:int}/Users/{userId}/get")]
@@ -153,6 +173,36 @@ public class AccountsController : ControllerBase
         }
 
         return Ok(accountuser);
+    }
+    [AuthFilter]
+    [HttpGet("{accountID:int}/Products")]
+    public IActionResult GetProducts([FromRoute]int accountID)
+    {
+        List<AccountProduct> ap = _accountRepository.GetAccountActiveProducts(accountID);
+
+        List<StoredAccountProdoctDto> sap = new List<StoredAccountProdoctDto>();
+
+        foreach (AccountProduct product in ap)
+        {
+            StoredAccountProdoctDto tmp = _mapper.Map<StoredAccountProdoctDto>(product);
+
+            tmp.Product = _mapper.Map<ProductDto>(product.Product);
+
+            sap.Add(tmp);
+        }
+        sap = sap.OrderByDescending(s=>s.ExpirationDate.HasValue).ThenBy(s => s.ExpirationDate).ToList();
+
+        if (ap == null)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(sap);
     }
 
     [HttpPost]
@@ -304,16 +354,6 @@ public class AccountsController : ControllerBase
     }
 
     [AuthFilter]
-    [HttpGet("{accountId:int}/Fixedproducts/")]
-    public IActionResult GetFixedProducts([FromRoute] int accountId)
-    {
-
-        List<FixedProduct> fp = new List<FixedProduct>();
-
-        fp = _accountRepository.GetFixedProducts(accountId);
-
-        return Ok(fp);
-    }
     [HttpPut("{accountId:int}/Fixedproducts/{productid:int}/Ranout")]
     public IActionResult AddFixedProduct([FromRoute] int accountId, [FromRoute] int productid)
     {
@@ -334,16 +374,19 @@ public class AccountsController : ControllerBase
     
     [AuthFilter]
     [HttpPut("{accountId:int}/Fixedproducts/Update")]
-    public IActionResult UpdateFixedProducts([FromBody] Dictionary<int, int> data, [FromRoute] int accountId)
+    public IActionResult UpdateFixedProducts([FromRoute] int accountId, [FromBody] string data)
     {
-        if (!ModelState.IsValid)
-            return BadRequest();
+        //data = data.Replace('"', '\'');
 
-        if (!_accountRepository.UpdateActiveFixedProducts(data, accountId))
+        Dictionary<int, int> values = JsonConvert.DeserializeObject<Dictionary<int, int>>(data);
+
+        if (!_accountRepository.UpdateActiveFixedProducts(values, accountId))
         {
             ModelState.AddModelError("", "products could not be updated");
             return StatusCode(500, ModelState);
         }
+        if (!ModelState.IsValid)
+        return BadRequest();
 
         return NoContent();
     }

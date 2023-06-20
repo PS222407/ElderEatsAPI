@@ -150,7 +150,7 @@ public class ProductRepository : IProductRepository
     }
 
 
-    public bool UpdateProductExpirationDateFromAccountById(int accountProductId, DateTime date)
+    public bool UpdateProductExpirationDateFromAccountById(int accountProductId, DateTime? date)
     {
         AccountProduct? accountProduct = _context.AccountProducts.FirstOrDefault(ap => ap.Id == accountProductId);
 
@@ -180,5 +180,18 @@ public class ProductRepository : IProductRepository
         }
 
         return p;
+    }
+
+    public AccountProduct? GetProductWithConnectionByConnectionID(int AccountProductID)
+    {
+        Product p = null;
+
+        AccountProduct? ap = _context.AccountProducts.FirstOrDefault(ap => ap.Id == AccountProductID);
+        if (ap != null)
+        {
+            ap.Product = GetProduct(ap.ProductId);
+        }
+
+        return ap;
     }
 }
