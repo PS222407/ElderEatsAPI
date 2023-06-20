@@ -370,7 +370,7 @@ public class AccountsController : ControllerBase
     {
         if (!ModelState.IsValid)
             return BadRequest();
-        if(!_accountRepository.AccountExists(accountId) || !_productRepository.ProductExists(productid))
+        if(!_accountRepository.AccountExists(accountId) || !_accountRepository.ProductExists(productid))
         {
             ModelState.AddModelError("", "Adding fixed product went wrong");
 
