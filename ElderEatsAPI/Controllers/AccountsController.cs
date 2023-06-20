@@ -354,17 +354,6 @@ public class AccountsController : ControllerBase
     }
 
     [AuthFilter]
-    [HttpGet("{accountId:int}/Fixedproducts/")]
-    public IActionResult GetFixedProducts([FromRoute] int accountId)
-    {
-
-        List<FixedProduct> fp = new List<FixedProduct>();
-
-        fp = _accountRepository.GetFixedProducts(accountId);
-  
-        return Ok(fp);
-    }
-
     [HttpPut("{accountId:int}/Fixedproducts/{productid:int}/Ranout")]
     public IActionResult AddFixedProduct([FromRoute] int accountId, [FromRoute] int productid)
     {
@@ -401,5 +390,4 @@ public class AccountsController : ControllerBase
 
         return NoContent();
     }
-
 }
