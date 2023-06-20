@@ -67,3 +67,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+// "DefaultConnection": "Server=46.101.187.55;Port=3306;Database=eldereats;User ID=jens;Password=password;"
+

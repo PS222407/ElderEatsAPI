@@ -99,7 +99,7 @@ public class ProductsController : ControllerBase
         {
             ProductGroupedViewModel productGroupedViewModel = new ProductGroupedViewModel
             {
-                AccountProduct = _mapper.Map<AccountProductViewModel>(item.Product.AccountProducts[0]),
+                AccountProduct = _mapper.Map<AccountProductViewModel>(item.AccountProduct),
                 Product = _mapper.Map<ProductViewModel>(item.Product),
                 Count = item.Count,
             };

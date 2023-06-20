@@ -70,6 +70,7 @@ public class ProductRepository : IProductRepository
             {
                 Count = row.Count,
                 Product = row.Product,
+                AccountProduct = row.AccountProduct,
             };
             productGroupedDtos.Add(productGroupedDto);
         }
