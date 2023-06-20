@@ -24,8 +24,9 @@ public interface IProductRepository
 
     public bool DeleteProductFromAccountById(int accountProductId);
 
-    public bool UpdateProductExpirationDateFromAccountById(int id, DateTime date);
+    public bool UpdateProductExpirationDateFromAccountById(int id, DateTime? date);
 
     public Product? GetProductByConnectionID(int AccountProductID);
+    public AccountProduct? GetProductWithConnectionByConnectionID(int AccountProductID);
 
 }

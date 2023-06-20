@@ -2,5 +2,5 @@
 
 public class AccountProductUpdateRequest
 {
-    public DateTime ExpirationDate { get; set; }
+    public DateTime? ExpirationDate { get; set; }
 }

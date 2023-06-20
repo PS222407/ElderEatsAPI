@@ -6,6 +6,7 @@ using ElderEatsAPI.Interfaces;
 using ElderEatsAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
+using System.Collections.Generic;
 
 namespace ElderEatsAPI.Repositories;
 
@@ -81,14 +82,23 @@ public class AccountRepository : IAccountRepository
         return _context.AccountProducts.Where(ap => ap.AccountId == id).Select(p => p.Product).ToList();
     }
 
-    public List<Product> GetAccountActiveProducts(int id)
+    public List<AccountProduct> GetAccountActiveProducts(int id)
     {
-        return _context.AccountProducts
+        List < AccountProduct > ap = _context.AccountProducts
             .Where(ap => ap.AccountId == id)
             .Where(ap => ap.RanOutAt > DateTime.Now || ap.RanOutAt == null)
-            .Select(p => p.Product)
             .ToList();
+
+        foreach (AccountProduct product in ap)
+        {
+            product.Product = _context.Products.Where(p => p.Id == product.ProductId).FirstOrDefault();
+        }
+
+        int i = 1;
+
+        return ap;
     }
+
 
     public Account? StoreAccount(Account account)
     {
@@ -199,15 +209,6 @@ public class AccountRepository : IAccountRepository
     {
         return _context.SaveChanges() > 0;
     }
-
-    public List<FixedProduct>? GetFixedProducts(int accountId)
-    {
-        List<FixedProduct> p = new List<FixedProduct>();
-
-        p = _context.FixedProducts.Where(p => p.AccountId == accountId && p.isActive == true).ToList();
-
-        return p;
-    }
     public bool IsFixedProductConnectedToAccount(int accountId, FixedProduct fixedProduct)
     {
         FixedProduct? TestProduct = _context.FixedProducts.Where(fp => fp.AccountId == accountId && fp.Id == fixedProduct.Id).FirstOrDefault();
@@ -292,5 +293,19 @@ public class AccountRepository : IAccountRepository
             }
         }
         return null;
+    }
+    public List<FixedProduct>? GetFixedProducts(int accountID)
+    {
+        List<FixedProduct> fixedProducts = _context.FixedProducts.Where(fp => fp.AccountId == accountID && fp.isActive == true).ToList();
+
+        foreach (FixedProduct fixedProduct in fixedProducts)
+        {
+            fixedProduct.Product = _context.Products.Where(p=>p.Id == fixedProduct.ProductId).FirstOrDefault();
+            fixedProduct.Account = _context.Accounts.Where(a => a.Id == fixedProduct.AccountId).FirstOrDefault();
+        }
+
+        int i = 1;
+
+        return fixedProducts;
     }
 }

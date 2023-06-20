@@ -23,6 +23,8 @@ public class MappingProfiles : Profile
         CreateMap<User, UserRegistrationViewModel>();
         CreateMap<AccountUserUpdateRequest, AccountUser>();
         CreateMap<ProductStoreRequest, Product>();
-        CreateMap<ProductImageRequest,Product>();
+        CreateMap<ProductImageRequest, Product>();
+        CreateMap<Product, ProductDto>();
+        CreateMap<AccountProduct, StoredAccountProdoctDto>();
     }
 }
