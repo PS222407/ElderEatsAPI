@@ -130,7 +130,7 @@ public class ProductsController : ControllerBase
 
     [AuthFilter]
     [HttpGet("{id:int}")]
-    public IActionResult GetProduct(int id)
+    public IActionResult GetProduct([FromRoute]int id)
     {
         ProductViewModel productViewModel = _mapper.Map<ProductViewModel>(_productRepository.GetProduct(id));
 
