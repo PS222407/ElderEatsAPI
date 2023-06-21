@@ -6,6 +6,7 @@ using ElderEatsAPI.Interfaces;
 using ElderEatsAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
+using System.Collections.Generic;
 
 namespace ElderEatsAPI.Repositories;
 
@@ -28,9 +29,17 @@ public class AccountRepository : IAccountRepository
         return _context.Accounts.FirstOrDefault(a => a.Token == token);
     }
 
-    public Account? GetAccountByTemporaryToken(string temporaryToken)
+    public Account? GetAccountByTemporaryToken(string temporaryToken, bool NotExpiredOnly = false)
     {
-        return _context.Accounts.FirstOrDefault(a => a.TemporaryToken == temporaryToken);
+        if (!NotExpiredOnly)
+        {
+            return _context.Accounts.FirstOrDefault(a => a.TemporaryToken == temporaryToken);
+        }
+        else
+        {
+            return _context.Accounts.FirstOrDefault(a => a.TemporaryToken == temporaryToken && a.TemporaryTokenExpiresAt > DateTime.Now);
+        }
+
     }
 
     public Account? GetAccountWithUsers(int id)
@@ -73,14 +82,23 @@ public class AccountRepository : IAccountRepository
         return _context.AccountProducts.Where(ap => ap.AccountId == id).Select(p => p.Product).ToList();
     }
 
-    public List<Product> GetAccountActiveProducts(int id)
+    public List<AccountProduct> GetAccountActiveProducts(int id)
     {
-        return _context.AccountProducts
+        List < AccountProduct > ap = _context.AccountProducts
             .Where(ap => ap.AccountId == id)
             .Where(ap => ap.RanOutAt > DateTime.Now || ap.RanOutAt == null)
-            .Select(p => p.Product)
             .ToList();
+
+        foreach (AccountProduct product in ap)
+        {
+            product.Product = _context.Products.Where(p => p.Id == product.ProductId).FirstOrDefault();
+        }
+
+        int i = 1;
+
+        return ap;
     }
+
 
     public Account? StoreAccount(Account account)
     {
@@ -190,5 +208,104 @@ public class AccountRepository : IAccountRepository
     private bool Save()
     {
         return _context.SaveChanges() > 0;
+    }
+    public bool IsFixedProductConnectedToAccount(int accountId, FixedProduct fixedProduct)
+    {
+        FixedProduct? TestProduct = _context.FixedProducts.Where(fp => fp.AccountId == accountId && fp.Id == fixedProduct.Id).FirstOrDefault();
+        if (TestProduct != null)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public bool UpdateActiveFixedProducts(Dictionary<int, int> Data, int accountId)
+    {
+        bool returnVal = true;
+
+        foreach (int key in Data.Keys)
+        {
+            FixedProduct? fixedproduct = _context.FixedProducts.Where(fp => fp.Id == key).FirstOrDefault();
+            if (fixedproduct != null)
+            {
+                if (IsFixedProductConnectedToAccount(accountId, fixedproduct))
+                {
+                    fixedproduct.isActive = Convert.ToBoolean(Data[key]);
+                    fixedproduct.UpdatedAt = DateTime.Now;
+                }
+                else
+                {
+                    returnVal = false;
+                }
+            }
+            else
+            {
+                returnVal = false;
+            }
+        }
+        _context.SaveChanges();
+
+        return returnVal;
+    }
+
+
+    public AccountUser? CreateAccountUser(int accountId, int userId)
+    {
+        IUserRepository u = new UserRepository(_context);
+
+        if (AccountExists(accountId) && u.FindUserById(userId) != null)
+        {
+
+            AccountUser? accountUser = new AccountUser();
+
+
+            if (AccountUserExists(accountId, userId))
+            {
+                accountUser = _context.AccountUsers.Where(au => au.AccountId == accountId && au.UserId == userId).FirstOrDefault();
+                accountUser.UpdatedAt = DateTime.Now;
+                if (accountUser != null)
+                {
+                    accountUser.Status = 1;
+                    Save();
+
+                    return accountUser;
+                }
+            }
+            else
+            {         
+                accountUser.AccountId = accountId;
+                accountUser.UserId = userId;
+                accountUser.Status = 1;
+                accountUser.CreatedAt = DateTime.Now;
+                accountUser.UpdatedAt = DateTime.Now;
+                _context.AccountUsers.Add(accountUser);
+
+                Save();
+
+                accountUser = _context.AccountUsers.Where(au => au.AccountId == accountId && au.UserId == userId).FirstOrDefault();
+                if (accountUser != null)
+                {
+                    return accountUser;
+                }
+            }
+        }
+        return null;
+    }
+    public List<FixedProduct>? GetFixedProducts(int accountID)
+    {
+        List<FixedProduct> fixedProducts = _context.FixedProducts.Where(fp => fp.AccountId == accountID && fp.isActive == true).ToList();
+
+        foreach (FixedProduct fixedProduct in fixedProducts)
+        {
+            fixedProduct.Product = _context.Products.Where(p=>p.Id == fixedProduct.ProductId).FirstOrDefault();
+            fixedProduct.Account = _context.Accounts.Where(a => a.Id == fixedProduct.AccountId).FirstOrDefault();
+        }
+
+        int i = 1;
+
+        return fixedProducts;
     }
 }

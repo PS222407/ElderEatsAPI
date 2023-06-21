@@ -13,10 +13,10 @@ public class FixedProduct
     public long ProductId { get; set; }
 
     [Column("created_at")]
-    public DateTime CreatedAt { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
     [Column("updated_at")]
-    public DateTime UpdatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 
     [Column("is_active")]
     public bool isActive { get; set; }

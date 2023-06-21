@@ -13,10 +13,10 @@ public class MappingProfiles : Profile
         CreateMap<Account, AccountViewModel>();
         CreateMap<AccountUser, AccountUserViewModel>();
         CreateMap<AccountProduct, AccountProductViewModel>();
+        CreateMap<AccountProductDto, AccountProduct>();
         CreateMap<Product, ProductViewModel>();
         CreateMap<User, UserViewModel>();
         CreateMap<ProductGroupedDto, ProductGroupedViewModel>();
-        CreateMap<AccountProductDto, AccountProduct>();
         CreateMap<AccountStoreRequest, Account>();
         CreateMap<UserRegistrationRequest, User>();
         CreateMap<UserLoginRequest, User>();
@@ -24,5 +24,7 @@ public class MappingProfiles : Profile
         CreateMap<AccountUserUpdateRequest, AccountUser>();
         CreateMap<ProductStoreRequest, Product>();
         CreateMap<ProductImageRequest, Product>();
+        CreateMap<Product, ProductDto>();
+        CreateMap<AccountProduct, StoredAccountProdoctDto>();
     }
 }

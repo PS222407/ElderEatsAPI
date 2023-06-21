@@ -7,8 +7,10 @@ using Microsoft.CodeAnalysis;
 using ElderEatsAPI.Middleware;
 using ElderEatsAPI.Requests;
 using ElderEatsAPI.ViewModels;
-using Microsoft.CodeAnalysis;
 using ElderEatsAPI.Dto;
+using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using NuGet.Protocol;
 
 namespace ElderEatsAPI.Controllers;
 
@@ -47,6 +49,24 @@ public class AccountsController : ControllerBase
     public IActionResult GetAccountByTemporaryToken(string temporaryToken)
     {
         AccountViewModel? accountViewModel = _mapper.Map<AccountViewModel>(_accountRepository.GetAccountByTemporaryToken(temporaryToken));
+
+        if (accountViewModel == null)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(accountViewModel);
+    }
+
+    [HttpGet("TemporaryToken/{temporaryToken}/limted")]
+    public IActionResult GetAccountByTemporaryTokenLimted(string temporaryToken)
+    {
+        AccountViewModel? accountViewModel = _mapper.Map<AccountViewModel>(_accountRepository.GetAccountByTemporaryToken(temporaryToken, true));
 
         if (accountViewModel == null)
         {
@@ -117,6 +137,73 @@ public class AccountsController : ControllerBase
 
         return Ok(accountViewModel);
     }
+    [HttpGet("{accountId:int}/FixedProducts/")]
+    public IActionResult GetFixedProduct([FromRoute] int accountId)
+    {
+        List<FixedProduct>? fixedProducts = _accountRepository.GetFixedProducts(accountId);
+
+
+        if (fixedProducts == null)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(fixedProducts);
+    }
+
+    [AuthFilter]
+    [HttpGet("{accountID:int}/Users/{userId}/get")]
+    public IActionResult GetAccountUserByIds(int accountID, int userId)
+    {
+        AccountUser? accountuser = _accountRepository.FindAccountUser(accountID, userId);
+
+        if (accountuser == null)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(accountuser);
+    }
+    [AuthFilter]
+    [HttpGet("{accountID:int}/Products")]
+    public IActionResult GetProducts([FromRoute]int accountID)
+    {
+        List<AccountProduct> ap = _accountRepository.GetAccountActiveProducts(accountID);
+
+        List<StoredAccountProdoctDto> sap = new List<StoredAccountProdoctDto>();
+
+        foreach (AccountProduct product in ap)
+        {
+            StoredAccountProdoctDto tmp = _mapper.Map<StoredAccountProdoctDto>(product);
+
+            tmp.Product = _mapper.Map<ProductDto>(product.Product);
+
+            sap.Add(tmp);
+        }
+        sap = sap.OrderByDescending(s=>s.ExpirationDate.HasValue).ThenBy(s => s.ExpirationDate).ToList();
+
+        if (ap == null)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(sap);
+    }
 
     [HttpPost]
     public IActionResult StoreAccount([FromBody] AccountStoreRequest accountDto)
@@ -164,6 +251,27 @@ public class AccountsController : ControllerBase
         return NoContent();
     }
 
+    [AccountAuthFilter("account")]
+    [HttpPut("{accountId:int}/User/{userId:int}/Create")]
+    public IActionResult CreateAccountUserConnection([FromRoute] int accountId, [FromRoute] int userId)
+    {
+        AccountUser? accountUser = _accountRepository.CreateAccountUser(accountId, userId);
+
+        if (accountUser == null)
+        {
+            ModelState.AddModelError("", "Account User connection could not be made");
+
+            return StatusCode(500, ModelState);
+        }
+        if (!ModelState.IsValid)
+        {
+            return BadRequest();
+        }
+
+        return Ok(accountUser);
+
+    }
+
     [AuthFilter]
     [HttpPut("{accountId:int}/User/{userId:int}")]
     public IActionResult UpdateAccountUserConnection([FromRoute] int accountId, [FromRoute] int userId, [FromBody] AccountUserUpdateRequest accountUserUpdateRequest)
@@ -209,7 +317,6 @@ public class AccountsController : ControllerBase
 
         return NoContent();
     }
-
     [HttpPut("{accountId:int}/Products/{productId:int}/Create")]
     public IActionResult CreateAccountProductConnection([FromRoute] int accountId, [FromRoute] int productId)
     {
@@ -229,7 +336,7 @@ public class AccountsController : ControllerBase
         return NoContent();
     }
 
-    [HttpPut("Products/{connectionID:int}/RanOut")]
+    [HttpPut("Products/{connectionID:int}/Ranout")]
     public IActionResult AccountProductRanout([FromRoute] int connectionID)
     {
         if (!ModelState.IsValid)
@@ -246,19 +353,40 @@ public class AccountsController : ControllerBase
         return NoContent();
     }
 
-    [HttpPut("{accountId:int}/FixedProducts/{productid:int}/RanOut")]
+    [AuthFilter]
+    [HttpPut("{accountId:int}/Fixedproducts/{productid:int}/Ranout")]
     public IActionResult AddFixedProduct([FromRoute] int accountId, [FromRoute] int productid)
     {
         if (!ModelState.IsValid)
             return BadRequest();
-        if (!_accountRepository.AccountExists(accountId) || !_accountRepository.ProductExists(productid))
+        if(!_accountRepository.AccountExists(accountId) || !_accountRepository.ProductExists(productid))
         {
             ModelState.AddModelError("", "Adding fixed product went wrong");
 
             return StatusCode(500, ModelState);
         }
+        else
+        {
+            _accountRepository.StoreFixedProduct(accountId, productid);
+        }
+        return NoContent();
+    }
 
-        _accountRepository.StoreFixedProduct(accountId, productid);
+    [AuthFilter]
+    [HttpPut("{accountId:int}/Fixedproducts/Update")]
+    public IActionResult UpdateFixedProducts([FromRoute] int accountId, [FromBody] string data)
+    {
+        //data = data.Replace('"', '\'');
+
+        Dictionary<int, int> values = JsonConvert.DeserializeObject<Dictionary<int, int>>(data);
+
+        if (!_accountRepository.UpdateActiveFixedProducts(values, accountId))
+        {
+            ModelState.AddModelError("", "products could not be updated");
+            return StatusCode(500, ModelState);
+        }
+        if (!ModelState.IsValid)
+        return BadRequest();
 
         return NoContent();
     }

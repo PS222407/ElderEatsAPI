@@ -6,6 +6,8 @@ using ElderEatsAPI.Dto;
 using ElderEatsAPI.Middleware;
 using ElderEatsAPI.Requests;
 using ElderEatsAPI.ViewModels;
+using Newtonsoft.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ElderEatsAPI.Controllers;
 
@@ -179,7 +181,7 @@ public class ProductsController : ControllerBase
         return Ok(paginatedViewModel);
     }
 
-    [AuthFilter]
+    [AuthFilter] 
     [HttpGet("Product/Barcode/{barcode}")]
     public IActionResult GetProductByBarcode(string barcode)
     {
@@ -197,7 +199,6 @@ public class ProductsController : ControllerBase
 
         return Ok(productViewModel);
     }
-
     [HttpGet("Product/Connection/{connectionID}")]
     public IActionResult GetProductByConnectionID(int connectionID)
     {
@@ -215,11 +216,30 @@ public class ProductsController : ControllerBase
 
         return Ok(productDto);
     }
+    [HttpGet("Product/Connection/{connectionID}/withConnection")]
+    public IActionResult GetProductByConnectionIDWithConnection(int connectionID)
+    {
+        StoredAccountProdoctDto productDto = _mapper.Map<StoredAccountProdoctDto>(_productRepository.GetProductWithConnectionByConnectionID(connectionID));
+
+        if (productDto == null)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(productDto);
+    }
 
     [AuthFilter]
-    [HttpPost("Product/Image")]
-    public IActionResult StoreImageOfProduct(ProductImageRequest pir)
+    [HttpPut("Product/Image")]
+    public IActionResult StoreImageOfProduct([FromBody]string pir_string)
     {
+        ProductImageRequest pir = JsonConvert.DeserializeObject<ProductImageRequest>(pir_string);
+
         if (!_productRepository.StoreProductImageLink(pir.Id, pir.Image))
         {
             ModelState.AddModelError("", "Error while creating product to database");
@@ -248,8 +268,10 @@ public class ProductsController : ControllerBase
 
     [AuthFilter]
     [HttpPut("Account/{accountProductId:int}/ExpirationDate")]
-    public IActionResult UpdateProductExpirationDateFromAccountById([FromRoute] int accountProductId, [FromBody] AccountProductUpdateRequest accountProductUpdateRequest)
+    public IActionResult UpdateProductExpirationDateFromAccountById([FromRoute] int accountProductId, [FromBody] string data)
     {
+        AccountProductUpdateRequest accountProductUpdateRequest = JsonConvert.DeserializeObject<AccountProductUpdateRequest>(data);
+
         if (!_productRepository.UpdateProductExpirationDateFromAccountById(accountProductId, accountProductUpdateRequest.ExpirationDate))
         {
             return BadRequest("Error while updating product, check if the accountProductId is valid");

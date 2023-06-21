@@ -36,7 +36,7 @@ public class UserController : ControllerBase
         return Ok(_mapper.Map<UserRegistrationViewModel>(userValidationDto.User));
     }
 
-    [HttpPost("{userId}/Accounts")]
+    [HttpGet("{userId}/Accounts")]
     public IActionResult GetAccounts([FromRoute] int userId)
     {
         if (userId == null)
@@ -44,13 +44,17 @@ public class UserController : ControllerBase
             ModelState.AddModelError("", "no user");
             return BadRequest(ModelState);
         }
+        List<Account>? accounts = _userRepository.getConnectedAccounts(userId);
 
-        List<Account> accounts = _userRepository.getConnectedAccounts(userId, false);
+        if(accounts == null)
+        {
+            return NotFound();
+        }
 
         return Ok(accounts);
     }
 
-    [HttpPost("{userId}/Accounts/Active")]
+    [HttpGet("{userId}/Accounts/Active")]
     public IActionResult GetAccountsActive([FromRoute] int userId)
     {
         if (userId == null)

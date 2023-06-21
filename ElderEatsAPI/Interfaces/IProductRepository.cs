@@ -18,14 +18,15 @@ public interface IProductRepository
     public PaginateDto<Product> SearchProductsByNamePaginated(string? name, int skip, int take);
 
     public Product? GetProductByBarcode(string barcode);
-
     public bool StoreProductImageLink(int productID, string ImageUrl);
     
     public bool StoreProduct(Product product);
 
     public bool DeleteProductFromAccountById(int accountProductId);
 
-    public bool UpdateProductExpirationDateFromAccountById(int id, DateTime date);
+    public bool UpdateProductExpirationDateFromAccountById(int id, DateTime? date);
 
     public Product? GetProductByConnectionID(int AccountProductID);
+    public AccountProduct? GetProductWithConnectionByConnectionID(int AccountProductID);
+
 }

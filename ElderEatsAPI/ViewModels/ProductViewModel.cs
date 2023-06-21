@@ -17,10 +17,29 @@ public class ProductViewModel
 
     public string? Image { get; set; }
 
-/*    public List<AccountProduct>? AccountProducts { get; set; }
-
-    public bool ShouldSerializeAccountProducts()
+    public string full_name
     {
-        return AccountProducts != null && AccountProducts.Count > 0;
-    }*/
+        get
+        {
+            string val = Name;
+            if (!string.IsNullOrEmpty(Brand))
+            {
+                val += " - ";
+                val += Brand;
+            }
+            if (!string.IsNullOrEmpty(QuantityInPackage))
+            {
+                val += " - ";
+                val += QuantityInPackage;
+            }
+            return val;
+        }
+    }
+
+    /*    public List<AccountProduct>? AccountProducts { get; set; }
+
+        public bool ShouldSerializeAccountProducts()
+        {
+            return AccountProducts != null && AccountProducts.Count > 0;
+        }*/
 }
