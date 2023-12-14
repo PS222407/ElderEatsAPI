@@ -41,8 +41,8 @@ public class DeployController : ControllerBase
     private static void GitPull()
     {
         const string projectPath = "/var/www/toepenreact";
-        const string command = "sudo git pull";
-        const string arguments = "";
+        const string command = "git";
+        const string arguments = "pull";
 
         ProcessStartInfo psi = new()
         {
