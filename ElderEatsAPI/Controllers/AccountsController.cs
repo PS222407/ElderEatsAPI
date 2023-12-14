@@ -3,14 +3,11 @@ using ElderEatsAPI.Models;
 using ElderEatsAPI.Interfaces;
 using AutoMapper;
 using ElderEatsAPI.Auth;
-using Microsoft.CodeAnalysis;
 using ElderEatsAPI.Middleware;
 using ElderEatsAPI.Requests;
 using ElderEatsAPI.ViewModels;
 using ElderEatsAPI.Dto;
 using Newtonsoft.Json;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using NuGet.Protocol;
 
 namespace ElderEatsAPI.Controllers;
 
