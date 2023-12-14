@@ -7,6 +7,13 @@ namespace ElderEatsAPI.Controllers;
 [Route("api/v2/[controller]")]
 public class DeployController : ControllerBase
 {
+    private readonly IConfiguration _configuration;
+    
+    public DeployController(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+    
     [HttpPost]
     public IActionResult DeployReact([FromBody] DeployRequest deployRequest)
     {
@@ -14,7 +21,14 @@ public class DeployController : ControllerBase
         {
             ModelState.AddModelError("", "Secret is required");
 
-            return StatusCode(500, ModelState);
+            return StatusCode(401, ModelState);
+        }
+
+        if (deployRequest.secret != _configuration.GetValue<string>("DeploySecret"))
+        {
+            ModelState.AddModelError("", "Secret is invalid");
+
+            return StatusCode(401, ModelState);
         }
         
         Deploy();
