@@ -72,8 +72,8 @@ public class DeployController : ControllerBase
     private static void NpmInstall()
     {
         const string projectPath = "/var/www/toepenreact";
-        const string npmCommand = "npm i";
-        const string npmArguments = "";
+        const string npmCommand = "npm";
+        const string npmArguments = "install";
 
         ProcessStartInfo psi = new()
         {
